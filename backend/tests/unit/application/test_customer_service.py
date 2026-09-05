@@ -1,7 +1,12 @@
-
+import uuid
 from uuid import UUID
+import pytest
 
 from app.domain.customers.entities import Customer
+from app.application.customers.customer_service import (
+    CustomerAlreadyExistsError,
+    CustomerService,
+)
 
 
 class FakeCustomerRepository:
@@ -13,9 +18,17 @@ class FakeCustomerRepository:
         self,
         email: str,
     ) -> bool:
-
         return any(
             customer.email == email
+            for customer in self.customers
+        )
+
+    async def exists(
+        self,
+        customer_id: UUID,
+    ) -> bool:
+        return any(
+            customer.id == customer_id
             for customer in self.customers
         )
 
@@ -23,16 +36,13 @@ class FakeCustomerRepository:
         self,
         customer: Customer,
     ) -> Customer:
-
         self.customers.append(customer)
-
         return customer
 
     async def get_by_id(
         self,
         customer_id: UUID,
     ) -> Customer | None:
-
         return next(
             (
                 customer
@@ -42,13 +52,6 @@ class FakeCustomerRepository:
             None,
         )
 
-import pytest
-
-from app.application.customers.customer_service import (
-    CustomerAlreadyExistsError,
-    CustomerService,
-)
-
 
 @pytest.mark.anyio
 async def test_create_customer():
@@ -56,10 +59,12 @@ async def test_create_customer():
     repository = FakeCustomerRepository()
     service = CustomerService(repository)
 
+    random_email = f"anna_{uuid.uuid4().hex[:8]}@example.com"
+
     customer = await service.create_customer(
         first_name="Anna",
         last_name="Müller",
-        email="anna@example.com",
+        email=random_email,
     )
 
     assert customer.first_name == "Anna"

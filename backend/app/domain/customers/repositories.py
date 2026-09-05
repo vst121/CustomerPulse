@@ -36,3 +36,10 @@ class CustomerRepository(ABC):
         email: str,
     ) -> bool:
         pass
+
+    @abstractmethod
+    async def exists(
+        self, 
+        customer_id: UUID
+    ) -> bool:
+        ...

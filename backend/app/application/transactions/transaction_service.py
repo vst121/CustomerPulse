@@ -1,26 +1,41 @@
 from uuid import UUID, uuid4
+from decimal import Decimal
+from datetime import datetime
 
 from app.domain.transactions.entities import Transaction
 from app.domain.transactions.repositories import TransactionRepository
+from app.domain.customers.repositories import CustomerRepository
+from app.application.exceptions import CustomerNotFoundError
+from app.domain.transactions.entities import TransactionStatus, TransactionCategory
 
+from uuid import UUID, uuid4
 
 class TransactionService:
 
     def __init__(
         self,
-        repository: TransactionRepository,
+        transaction_repository: TransactionRepository,
+        customer_repository: CustomerRepository,
     ):
-        self._repository = repository
+        self.transaction_repository = transaction_repository
+        self.customer_repository = customer_repository
 
     async def create_transaction(
         self,
         customer_id: UUID,
-        amount,
+        amount: Decimal,
         currency: str,
-        category,
-        status,
-        timestamp,
+        category: TransactionCategory,
+        status: TransactionStatus,
+        timestamp: datetime,
     ) -> Transaction:
+
+        customer_exists = await self.customer_repository.exists(
+            customer_id
+        )
+
+        if not customer_exists:
+            raise CustomerNotFoundError(customer_id)
 
         transaction = Transaction(
             id=uuid4(),
@@ -32,8 +47,8 @@ class TransactionService:
             timestamp=timestamp,
         )
 
-        return await self._repository.add(transaction)
-
+        return await self.transaction_repository.add(transaction)
+    
     async def get_transaction(
         self,
         transaction_id: UUID,

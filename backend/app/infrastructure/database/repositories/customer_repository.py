@@ -2,10 +2,12 @@ from uuid import UUID
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.domain.customers.entities import Customer, LifecycleStage
 from app.domain.customers.repositories import CustomerRepository
 from app.infrastructure.database.models import CustomerModel
+
 
 
 class PostgresCustomerRepository(CustomerRepository):
@@ -122,6 +124,17 @@ class PostgresCustomerRepository(CustomerRepository):
 
         return result.scalar_one_or_none() is not None
 
+    async def exists(self, customer_id: UUID) -> bool:
+        statement = (
+            select(CustomerModel.id)
+            .where(CustomerModel.id == customer_id)
+            .limit(1)
+        )
+
+        result = await self.session.execute(statement)
+
+        return result.scalar_one_or_none() is not None    
+
     @staticmethod
     def _to_domain(
         model: CustomerModel,
@@ -137,3 +150,4 @@ class PostgresCustomerRepository(CustomerRepository):
             ),
             created_at=model.created_at,
         )
+
