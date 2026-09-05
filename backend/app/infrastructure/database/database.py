@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 DATABASE_URL = (
-    "postgresql+psycopg://"
+    "postgresql+asyncpg://"
     "customerpulse:customerpulse@localhost:5436/customerpulse"
 )
 
