@@ -1,0 +1,16 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: customerpulse-postgres
+    environment:
+      POSTGRES_DB: customerpulse
+      POSTGRES_USER: customerpulse
+      POSTGRES_PASSWORD: customerpulse
+    ports:
+      - "5436:5432"
+    volumes:
+      - customerpulse-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  customerpulse-postgres-data:
