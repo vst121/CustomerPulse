@@ -4,6 +4,13 @@ from uuid import UUID, uuid4
 from sqlalchemy import DateTime, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+from decimal import Decimal
+from uuid import UUID, uuid4
+
+from sqlalchemy import DateTime, Numeric, String
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey
+
 
 class Base(DeclarativeBase):
     pass
@@ -44,3 +51,43 @@ class CustomerModel(Base):
         DateTime(timezone=True),
         nullable=False,
     )
+
+class TransactionModel(Base):
+    __tablename__ = "transactions"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+        default=uuid4,
+    )
+
+    customer_id: Mapped[UUID] = mapped_column(
+        ForeignKey("customers.id"),
+        nullable=False,
+        index=True,
+    )
+
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(18, 2),
+        nullable=False,
+    )
+
+    currency: Mapped[str] = mapped_column(
+        String(3),
+        nullable=False,
+    )
+
+    category: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+    )
+
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+    )
+
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        index=True,
+    )    
