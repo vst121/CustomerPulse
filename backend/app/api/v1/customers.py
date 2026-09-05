@@ -1,15 +1,20 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.customers.customer_service import CustomerService
+from app.application.customers.customer_service import (
+    CustomerAlreadyExistsError,
+    CustomerService,
+)
+from app.domain.customers.entities import LifecycleStage
 from app.infrastructure.database.database import get_db_session
 from app.infrastructure.database.repositories.customer_repository import (
     PostgresCustomerRepository,
 )
 from app.schemas.customers import (
     CreateCustomerRequest,
+    CustomerListResponse,
     CustomerResponse,
 )
 
@@ -31,19 +36,25 @@ def get_customer_service(
 @router.post(
     "",
     response_model=CustomerResponse,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_customer(
     request: CreateCustomerRequest,
     service: CustomerService = Depends(get_customer_service),
 ):
 
-    customer = await service.create_customer(
-        first_name=request.first_name,
-        last_name=request.last_name,
-        email=str(request.email),
-    )
+    try:
+        return await service.create_customer(
+            first_name=request.first_name,
+            last_name=request.last_name,
+            email=str(request.email),
+        )
 
-    return customer
+    except CustomerAlreadyExistsError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        ) from exc
 
 @router.get(
     "/{customer_id}",
@@ -58,19 +69,45 @@ async def get_customer(
 
     if customer is None:
         raise HTTPException(
-            status_code=404,
-            detail="Customer not found",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Customer not found.",
         )
 
     return customer
 
 @router.get(
     "",
-    response_model=list[CustomerResponse],
+    response_model=CustomerListResponse,
 )
 async def get_customers(
+    page: int = Query(
+        default=1,
+        ge=1,
+    ),
+    page_size: int = Query(
+        default=20,
+        ge=1,
+        le=100,
+    ),
+    search: str | None = Query(
+        default=None,
+        min_length=1,
+    ),
+    lifecycle_stage: LifecycleStage | None = None,
     service: CustomerService = Depends(get_customer_service),
 ):
 
-    return await service.get_customers()
+    customers, total = await service.get_customers(
+        page=page,
+        page_size=page_size,
+        search=search,
+        lifecycle_stage=lifecycle_stage,
+    )
+
+    return CustomerListResponse(
+        items=customers,
+        page=page,
+        page_size=page_size,
+        total=total,
+    )
 

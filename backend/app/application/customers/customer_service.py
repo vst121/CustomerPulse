@@ -1,8 +1,15 @@
 from datetime import datetime, timezone
-from uuid import uuid4
+from uuid import UUID
 
-from app.domain.customers.entities import Customer
+from app.domain.customers.entities import (
+    Customer,
+    LifecycleStage,
+)
 from app.domain.customers.repositories import CustomerRepository
+
+
+class CustomerAlreadyExistsError(Exception):
+    pass
 
 
 class CustomerService:
@@ -20,12 +27,17 @@ class CustomerService:
         email: str,
     ) -> Customer:
 
+        if await self._repository.exists_by_email(email):
+            raise CustomerAlreadyExistsError(
+                f"Customer with email '{email}' already exists."
+            )
+
         customer = Customer(
-            id=uuid4(),
+            id=UUID(int=0),
             first_name=first_name,
             last_name=last_name,
             email=email,
-            lifecycle_stage="ACQUISITION",
+            lifecycle_stage=LifecycleStage.ACQUISITION,
             created_at=datetime.now(timezone.utc),
         )
 
@@ -33,11 +45,22 @@ class CustomerService:
 
     async def get_customer(
         self,
-        customer_id,
+        customer_id: UUID,
     ) -> Customer | None:
 
         return await self._repository.get_by_id(customer_id)
 
-    async def get_customers(self) -> list[Customer]:
+    async def get_customers(
+        self,
+        page: int,
+        page_size: int,
+        search: str | None = None,
+        lifecycle_stage: LifecycleStage | None = None,
+    ) -> tuple[list[Customer], int]:
 
-        return await self._repository.get_all()
+        return await self._repository.get_all(
+            page=page,
+            page_size=page_size,
+            search=search,
+            lifecycle_stage=lifecycle_stage,
+        )
