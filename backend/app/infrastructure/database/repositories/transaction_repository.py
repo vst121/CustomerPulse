@@ -89,6 +89,7 @@ class PostgresTransactionRepository(TransactionRepository):
         model = TransactionModel(
             id=transaction.id,
             customer_id=transaction.customer_id,
+            idempotency_key=transaction.idempotency_key,
             amount=transaction.amount,
             currency=transaction.currency,
             category=transaction.category.value,
@@ -103,6 +104,26 @@ class PostgresTransactionRepository(TransactionRepository):
 
         return self._to_domain(model)
 
+    async def get_by_idempotency_key(
+        self,
+        customer_id: UUID,
+        idempotency_key: str,
+    ) -> Transaction | None:
+
+        result = await self._session.execute(
+            select(TransactionModel).where(
+                TransactionModel.customer_id == customer_id,
+                TransactionModel.idempotency_key == idempotency_key,
+            )
+        )
+
+        model = result.scalar_one_or_none()
+
+        if model is None:
+            return None
+
+        return self._to_domain(model)
+
     @staticmethod
     def _to_domain(
         model: TransactionModel,
@@ -111,9 +132,11 @@ class PostgresTransactionRepository(TransactionRepository):
         return Transaction(
             id=model.id,
             customer_id=model.customer_id,
+            idempotency_key=model.idempotency_key,
             amount=model.amount,
             currency=model.currency,
             category=TransactionCategory(model.category),
             status=TransactionStatus(model.status),
             timestamp=model.timestamp,
         )
+

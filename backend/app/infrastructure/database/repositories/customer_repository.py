@@ -131,7 +131,7 @@ class PostgresCustomerRepository(CustomerRepository):
             .limit(1)
         )
 
-        result = await self.session.execute(statement)
+        result = await self._session.execute(statement)
 
         return result.scalar_one_or_none() is not None    
 

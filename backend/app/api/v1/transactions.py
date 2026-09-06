@@ -1,12 +1,22 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query,
+    Header,
+    status,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.transactions.transaction_service import (
     TransactionService,
 )
 from app.infrastructure.database.database import get_db_session
+from app.infrastructure.database.repositories.customer_repository import (
+    PostgresCustomerRepository,
+)
 from app.infrastructure.database.repositories.transaction_repository import (
     PostgresTransactionRepository,
 )
@@ -27,9 +37,19 @@ def get_transaction_service(
     session: AsyncSession = Depends(get_db_session),
 ) -> TransactionService:
 
-    repository = PostgresTransactionRepository(session)
+    transaction_repository = PostgresTransactionRepository(
+        session
+    )
 
-    return TransactionService(repository)
+    customer_repository = PostgresCustomerRepository(
+        session
+    )
+
+    return TransactionService(
+        transaction_repository=transaction_repository,
+        customer_repository=customer_repository,
+    )
+
 
 @router.post(
     "/customers/{customer_id}",
@@ -39,19 +59,26 @@ def get_transaction_service(
 async def create_transaction(
     customer_id: UUID,
     request: CreateTransactionRequest,
-    service: TransactionService = Depends(
+    idempotency_key: str = Header(
+        ...,
+        min_length=1,
+        max_length=100,
+    ),
+        service: TransactionService = Depends(
         get_transaction_service
     ),
 ):
 
     return await service.create_transaction(
         customer_id=customer_id,
+        idempotency_key=idempotency_key,
         amount=request.amount,
         currency=request.currency,
         category=request.category,
         status=request.status,
         timestamp=request.timestamp,
     )
+
 
 @router.get(
     "/customers/{customer_id}",
@@ -85,6 +112,7 @@ async def get_customer_transactions(
         total=total,
     )
 
+
 @router.get(
     "/{transaction_id}",
     response_model=TransactionResponse,
@@ -101,10 +129,8 @@ async def get_transaction(
     )
 
     if transaction is None:
-        from fastapi import HTTPException
-
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Transaction not found.",
         )
 

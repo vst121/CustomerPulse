@@ -1,14 +1,16 @@
-from uuid import UUID, uuid4
-from decimal import Decimal
 from datetime import datetime
-
-from app.domain.transactions.entities import Transaction
-from app.domain.transactions.repositories import TransactionRepository
-from app.domain.customers.repositories import CustomerRepository
-from app.application.exceptions import CustomerNotFoundError
-from app.domain.transactions.entities import TransactionStatus, TransactionCategory
-
+from decimal import Decimal
 from uuid import UUID, uuid4
+
+from app.application.exceptions import CustomerNotFoundError
+from app.domain.customers.repositories import CustomerRepository
+from app.domain.transactions.entities import (
+    Transaction,
+    TransactionCategory,
+    TransactionStatus,
+)
+from app.domain.transactions.repositories import TransactionRepository
+
 
 class TransactionService:
 
@@ -23,6 +25,7 @@ class TransactionService:
     async def create_transaction(
         self,
         customer_id: UUID,
+        idempotency_key: str,
         amount: Decimal,
         currency: str,
         category: TransactionCategory,
@@ -37,9 +40,21 @@ class TransactionService:
         if not customer_exists:
             raise CustomerNotFoundError(customer_id)
 
+        existing = await (
+            self.transaction_repository
+            .get_by_idempotency_key(
+                customer_id,
+                idempotency_key,
+            )
+        )
+
+        if existing is not None:
+            return existing
+
         transaction = Transaction(
             id=uuid4(),
             customer_id=customer_id,
+            idempotency_key=idempotency_key,
             amount=amount,
             currency=currency.upper(),
             category=category,
@@ -48,13 +63,13 @@ class TransactionService:
         )
 
         return await self.transaction_repository.add(transaction)
-    
+
     async def get_transaction(
         self,
         transaction_id: UUID,
     ) -> Transaction | None:
 
-        return await self._repository.get_by_id(
+        return await self.transaction_repository.get_by_id(
             transaction_id
         )
 
@@ -65,7 +80,7 @@ class TransactionService:
         page_size: int,
     ) -> tuple[list[Transaction], int]:
 
-        return await self._repository.get_by_customer_id(
+        return await self.transaction_repository.get_by_customer_id(
             customer_id=customer_id,
             page=page,
             page_size=page_size,

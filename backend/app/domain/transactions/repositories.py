@@ -28,3 +28,11 @@ class TransactionRepository(ABC):
         transaction: Transaction,
     ) -> Transaction:
         pass
+
+    @abstractmethod
+    async def get_by_idempotency_key(
+        self,
+        customer_id: UUID,
+        idempotency_key: str,
+    ) -> Transaction | None:
+        ... 

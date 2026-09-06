@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 
 from sqlalchemy import DateTime, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 
 
 class Base(DeclarativeBase):
@@ -55,6 +55,14 @@ class CustomerModel(Base):
 class TransactionModel(Base):
     __tablename__ = "transactions"
 
+    __table_args__ = (
+        UniqueConstraint(
+            "customer_id",
+            "idempotency_key",
+            name="uq_transaction_customer_idempotency_key",
+        ),
+    )
+
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4,
@@ -65,6 +73,11 @@ class TransactionModel(Base):
         nullable=False,
         index=True,
     )
+
+    idempotency_key: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )    
 
     amount: Mapped[Decimal] = mapped_column(
         Numeric(18, 2),

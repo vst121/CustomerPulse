@@ -26,6 +26,7 @@ class TransactionCategory(StrEnum):
 class Transaction:
     id: UUID
     customer_id: UUID
+    idempotency_key: str
     amount: Decimal
     currency: str
     category: TransactionCategory
