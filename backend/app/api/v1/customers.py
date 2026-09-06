@@ -30,7 +30,6 @@ def get_customer_service(
     uow = PostgresUnitOfWork(session)
 
     return CustomerService(
-        customer_repository=uow.customers,
         uow=uow,
     )
 

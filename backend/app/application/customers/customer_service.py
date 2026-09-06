@@ -5,7 +5,6 @@ from app.domain.customers.entities import (
     Customer,
     LifecycleStage,
 )
-from app.domain.customers.repositories import CustomerRepository
 from app.application.common.unit_of_work import UnitOfWork
 
 class CustomerAlreadyExistsError(Exception):
@@ -16,10 +15,8 @@ class CustomerService:
 
     def __init__(
         self,
-        customer_repository: CustomerRepository,
         uow: UnitOfWork,
     ):
-        self.customer_repository = customer_repository
         self.uow = uow
 
     async def create_customer(
@@ -29,7 +26,7 @@ class CustomerService:
         email: str,
     ) -> Customer:
 
-        if await self.customer_repository.exists_by_email(email):
+        if await self.uow.customers.exists_by_email(email):
             raise CustomerAlreadyExistsError(
                 f"Customer with email '{email}' already exists."
             )
@@ -43,7 +40,7 @@ class CustomerService:
             created_at=datetime.now(timezone.utc),
         )
 
-        created_customer = await self.customer_repository.add(customer)
+        created_customer = await self.uow.customers.add(customer)
         await self.uow.commit()
 
         return created_customer
@@ -53,7 +50,7 @@ class CustomerService:
         customer_id: UUID,
     ) -> Customer | None:
 
-        return await self.customer_repository.get_by_id(customer_id)
+        return await self.uow.customers.get_by_id(customer_id)
 
     async def get_customers(
         self,
@@ -63,7 +60,7 @@ class CustomerService:
         lifecycle_stage: LifecycleStage | None = None,
     ) -> tuple[list[Customer], int]:
 
-        return await self.customer_repository.get_all(
+        return await self.uow.customers.get_all(
             page=page,
             page_size=page_size,
             search=search,

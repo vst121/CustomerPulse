@@ -78,7 +78,6 @@ async def test_create_customer():
     uow = FakeUnitOfWork(repository)
 
     service = CustomerService(
-        customer_repository=repository,
         uow=uow,
     )
 
