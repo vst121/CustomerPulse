@@ -3,11 +3,12 @@ from decimal import Decimal
 from uuid import uuid4
 import pytest
 
-from backend.app.application.transactions.transaction_service import TransactionService
 from backend.app.domain.customers.entities import Customer, LifecycleStage
 from backend.app.domain.transactions.entities import TransactionCategory, TransactionStatus
 from backend.tests.unit.application.test_customer_service import FakeCustomerRepository
 from backend.tests.unit.application.test_unit_of_work import FakeUnitOfWork
+from app.application.transactions.transaction_service import TransactionService
+
 
 class FakeTransactionRepository:
     def __init__(self):

@@ -9,10 +9,12 @@ class FakeUnitOfWork(UnitOfWork):
         customer_repository=None,
         transaction_repository=None,
         customer_value_repository=None,
+        customer_score_repository=None,
     ):
         self.customers = customer_repository
         self.transactions = transaction_repository
         self.customer_values = customer_value_repository
+        self.customer_scores = customer_score_repository
 
         self.commit_count = 0
         self.rollback_count = 0
@@ -22,7 +24,7 @@ class FakeUnitOfWork(UnitOfWork):
 
     async def rollback(self):
         self.rollback_count += 1
-        
+
 @pytest.mark.anyio
 async def test_unit_of_work_rolls_back_on_exception():
 
