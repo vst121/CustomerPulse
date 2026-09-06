@@ -124,3 +124,17 @@ class CustomerValueModel(Base):
         nullable=False,
         default=0,
     ) 
+
+class CustomerScoreModel(Base):
+    __tablename__ = "customer_scores"
+
+    customer_id: Mapped[UUID] = mapped_column(
+        ForeignKey("customers.id"),
+        primary_key=True,
+    )
+
+    score: Mapped[Decimal] = mapped_column(
+        Numeric(5, 2),
+        nullable=False,
+        default=0,
+    )    

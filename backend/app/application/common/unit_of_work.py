@@ -3,12 +3,14 @@ from abc import ABC, abstractmethod
 from app.domain.customers.repositories import CustomerRepository
 from app.domain.transactions.repositories import TransactionRepository
 from app.domain.value.repositories import CustomerValueRepository
-
+from app.domain.scoring.repositories import CustomerScoreRepository
+    
 class UnitOfWork(ABC):
 
     customers: CustomerRepository
     transactions: TransactionRepository
     customer_values: CustomerValueRepository
+    customer_scores: CustomerScoreRepository
 
     async def __aenter__(self):
         return self
