@@ -2,13 +2,12 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.infrastructure.database.database import get_db_session
+from app.infrastructure.database.unit_of_work import PostgresUnitOfWork
 
 from app.application.customers.customer_360_service import (
     Customer360Service,
 )
-from app.infrastructure.database.database import get_db_session
-from app.infrastructure.database.unit_of_work import PostgresUnitOfWork
-
 from app.api.v1.schemas.customer_360 import (
     Customer360Response,
 )
