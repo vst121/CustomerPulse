@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.transactions.entities import (
@@ -89,18 +90,38 @@ class PostgresTransactionRepository(TransactionRepository):
         model = TransactionModel(
             id=transaction.id,
             customer_id=transaction.customer_id,
-            idempotency_key=transaction.idempotency_key,
             amount=transaction.amount,
             currency=transaction.currency,
             category=transaction.category.value,
             status=transaction.status.value,
             timestamp=transaction.timestamp,
+            idempotency_key=transaction.idempotency_key,
         )
 
         self._session.add(model)
 
-        await self._session.commit()
-        await self._session.refresh(model)
+        try:
+            await self._session.flush()
+
+        except IntegrityError as exc:
+            await self._session.rollback()
+
+            constraint_name = (
+                "uq_transaction_customer_idempotency_key"
+                if "uq_transaction_customer_idempotency_key"
+                in str(exc.orig)
+                else None
+            )
+
+            if (
+                constraint_name
+                == "uq_transaction_customer_idempotency_key"
+            ):
+                return await self._handle_idempotency_conflict(
+                    transaction
+                )
+
+            raise
 
         return self._to_domain(model)
 
@@ -123,6 +144,24 @@ class PostgresTransactionRepository(TransactionRepository):
             return None
 
         return self._to_domain(model)
+
+    async def _handle_idempotency_conflict(
+        self,
+        transaction: Transaction,
+    ) -> Transaction:
+
+        existing = await self.get_by_idempotency_key(
+            customer_id=transaction.customer_id,
+            idempotency_key=transaction.idempotency_key,
+        )
+
+        if existing is None:
+            raise RuntimeError(
+                "Transaction idempotency conflict occurred, "
+                "but the existing transaction could not be found."
+            )
+
+        return existing    
 
     @staticmethod
     def _to_domain(

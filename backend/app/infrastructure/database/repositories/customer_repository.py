@@ -2,7 +2,6 @@ from uuid import UUID
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
 from app.domain.customers.entities import Customer, LifecycleStage
 from app.domain.customers.repositories import CustomerRepository
@@ -106,8 +105,7 @@ class PostgresCustomerRepository(CustomerRepository):
 
         self._session.add(model)
 
-        await self._session.commit()
-        await self._session.refresh(model)
+        await self._session.flush()
 
         return self._to_domain(model)
 

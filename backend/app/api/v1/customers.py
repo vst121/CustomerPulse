@@ -29,9 +29,13 @@ def get_customer_service(
     session: AsyncSession = Depends(get_db_session),
 ) -> CustomerService:
 
-    repository = PostgresCustomerRepository(session)
+    customer_repository = PostgresCustomerRepository(session)
 
-    return CustomerService(repository)
+    return CustomerService(
+        customer_repository=customer_repository,
+        session=session,
+    )
+
 
 @router.post(
     "",
@@ -56,6 +60,7 @@ async def create_customer(
             detail=str(exc),
         ) from exc
 
+
 @router.get(
     "/{customer_id}",
     response_model=CustomerResponse,
@@ -74,6 +79,7 @@ async def get_customer(
         )
 
     return customer
+
 
 @router.get(
     "",
@@ -110,4 +116,3 @@ async def get_customers(
         page_size=page_size,
         total=total,
     )
-

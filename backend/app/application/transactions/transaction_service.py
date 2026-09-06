@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from uuid import UUID, uuid4
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.exceptions import CustomerNotFoundError
 from app.domain.customers.repositories import CustomerRepository
@@ -18,10 +19,12 @@ class TransactionService:
         self,
         transaction_repository: TransactionRepository,
         customer_repository: CustomerRepository,
+        session: AsyncSession,
     ):
         self.transaction_repository = transaction_repository
         self.customer_repository = customer_repository
-
+        self.session = session
+        
     async def create_transaction(
         self,
         customer_id: UUID,
@@ -62,7 +65,13 @@ class TransactionService:
             timestamp=timestamp,
         )
 
-        return await self.transaction_repository.add(transaction)
+        created_transaction = (
+            await self.transaction_repository.add(transaction)
+        )
+
+        await self.session.commit()
+
+        return created_transaction
 
     async def get_transaction(
         self,

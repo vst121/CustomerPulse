@@ -48,8 +48,8 @@ def get_transaction_service(
     return TransactionService(
         transaction_repository=transaction_repository,
         customer_repository=customer_repository,
+        session=session,
     )
-
 
 @router.post(
     "/customers/{customer_id}",

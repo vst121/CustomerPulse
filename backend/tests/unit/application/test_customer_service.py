@@ -1,5 +1,6 @@
 import uuid
 from uuid import UUID
+
 import pytest
 
 from app.domain.customers.entities import Customer
@@ -7,6 +8,15 @@ from app.application.customers.customer_service import (
     CustomerAlreadyExistsError,
     CustomerService,
 )
+
+
+class FakeSession:
+
+    def __init__(self):
+        self.commit_count = 0
+
+    async def commit(self):
+        self.commit_count += 1
 
 
 class FakeCustomerRepository:
@@ -56,10 +66,17 @@ class FakeCustomerRepository:
 @pytest.mark.anyio
 async def test_create_customer():
 
-    repository = FakeCustomerRepository()
-    service = CustomerService(repository)
+    customer_repository = FakeCustomerRepository()
+    session = FakeSession()
 
-    random_email = f"anna_{uuid.uuid4().hex[:8]}@example.com"
+    service = CustomerService(
+        customer_repository=customer_repository,
+        session=session,
+    )
+
+    random_email = (
+        f"anna_{uuid.uuid4().hex[:8]}@example.com"
+    )
 
     customer = await service.create_customer(
         first_name="Anna",
@@ -69,3 +86,5 @@ async def test_create_customer():
 
     assert customer.first_name == "Anna"
     assert customer.lifecycle_stage.value == "ACQUISITION"
+
+    assert session.commit_count == 1

@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
-from uuid import UUID
+from uuid import UUID, uuid4
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.customers.entities import (
     Customer,
@@ -16,9 +17,11 @@ class CustomerService:
 
     def __init__(
         self,
-        repository: CustomerRepository,
+        customer_repository: CustomerRepository,
+        session: AsyncSession,
     ):
-        self._repository = repository
+        self.customer_repository = customer_repository
+        self.session = session
 
     async def create_customer(
         self,
@@ -27,13 +30,13 @@ class CustomerService:
         email: str,
     ) -> Customer:
 
-        if await self._repository.exists_by_email(email):
+        if await self.customer_repository.exists_by_email(email):
             raise CustomerAlreadyExistsError(
                 f"Customer with email '{email}' already exists."
             )
 
         customer = Customer(
-            id=UUID(int=0),
+            id=uuid4(),
             first_name=first_name,
             last_name=last_name,
             email=email,
@@ -41,14 +44,17 @@ class CustomerService:
             created_at=datetime.now(timezone.utc),
         )
 
-        return await self._repository.add(customer)
+        created_customer = await self.customer_repository.add(customer)
+        await self.session.commit()
+
+        return created_customer
 
     async def get_customer(
         self,
         customer_id: UUID,
     ) -> Customer | None:
 
-        return await self._repository.get_by_id(customer_id)
+        return await self.customer_repository.get_by_id(customer_id)
 
     async def get_customers(
         self,
@@ -58,7 +64,7 @@ class CustomerService:
         lifecycle_stage: LifecycleStage | None = None,
     ) -> tuple[list[Customer], int]:
 
-        return await self._repository.get_all(
+        return await self.customer_repository.get_all(
             page=page,
             page_size=page_size,
             search=search,
