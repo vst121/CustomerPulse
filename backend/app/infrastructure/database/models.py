@@ -104,3 +104,23 @@ class TransactionModel(Base):
         nullable=False,
         index=True,
     )    
+
+class CustomerValueModel(Base):
+
+    __tablename__ = "customer_values"
+
+    customer_id: Mapped[UUID] = mapped_column(
+        ForeignKey("customers.id"),
+        primary_key=True,
+    )
+
+    total_spend: Mapped[Decimal] = mapped_column(
+        Numeric(18, 2),
+        nullable=False,
+        default=0,
+    )
+
+    transaction_count: Mapped[int] = mapped_column(
+        nullable=False,
+        default=0,
+    ) 
