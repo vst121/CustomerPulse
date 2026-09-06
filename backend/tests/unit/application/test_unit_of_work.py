@@ -10,11 +10,13 @@ class FakeUnitOfWork(UnitOfWork):
         transaction_repository=None,
         customer_value_repository=None,
         customer_score_repository=None,
+        recommendation_repository=None,
     ):
         self.customers = customer_repository
         self.transactions = transaction_repository
         self.customer_values = customer_value_repository
         self.customer_scores = customer_score_repository
+        self.recommendations = recommendation_repository
 
         self.commit_count = 0
         self.rollback_count = 0

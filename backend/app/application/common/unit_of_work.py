@@ -4,6 +4,7 @@ from app.domain.customers.repositories import CustomerRepository
 from app.domain.transactions.repositories import TransactionRepository
 from app.domain.value.repositories import CustomerValueRepository
 from app.domain.scoring.repositories import CustomerScoreRepository
+from app.domain.recommendations.repositories import RecommendationRepository
     
 class UnitOfWork(ABC):
 
@@ -11,7 +12,8 @@ class UnitOfWork(ABC):
     transactions: TransactionRepository
     customer_values: CustomerValueRepository
     customer_scores: CustomerScoreRepository
-
+    recommendations: RecommendationRepository
+    
     async def __aenter__(self):
         return self
 

@@ -138,3 +138,27 @@ class CustomerScoreModel(Base):
         nullable=False,
         default=0,
     )    
+
+class RecommendationModel(Base):
+    __tablename__ = "recommendations"
+
+    id: Mapped[UUID] = mapped_column(
+        primary_key=True,
+        default=uuid4,
+    )
+
+    customer_id: Mapped[UUID] = mapped_column(
+        ForeignKey("customers.id"),
+        nullable=False,
+        index=True,
+    )
+
+    type: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
+    )
+
+    reason: Mapped[str] = mapped_column(
+        String(500),
+        nullable=False,
+    )    

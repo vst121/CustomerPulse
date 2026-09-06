@@ -13,6 +13,9 @@ from app.infrastructure.database.repositories.customer_value_repository import (
 from app.infrastructure.database.repositories.customer_score_repository import (
     PostgresCustomerScoreRepository,
 )
+from app.infrastructure.database.repositories.recommendation_repository import (
+    PostgresRecommendationRepository,
+)
 
 class PostgresUnitOfWork(UnitOfWork):
 
@@ -23,6 +26,7 @@ class PostgresUnitOfWork(UnitOfWork):
         self.transactions = PostgresTransactionRepository(session)
         self.customer_values = PostgresCustomerValueRepository(session)    
         self.customer_scores = PostgresCustomerScoreRepository(session)            
+        self.recommendations = PostgresRecommendationRepository(session)
 
     async def commit(self) -> None:
         await self._session.commit()
