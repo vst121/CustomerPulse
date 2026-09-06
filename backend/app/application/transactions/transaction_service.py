@@ -8,7 +8,7 @@ from app.domain.transactions.entities import (
     TransactionCategory,
     TransactionStatus,
 )
-from backend.app.application.exceptions import CustomerNotFoundError
+from app.application.exceptions import CustomerNotFoundError
 from app.domain.value.entities import CustomerValue
 
 class TransactionService:
