@@ -8,6 +8,7 @@ from app.application.customers.customer_service import (
     CustomerService,
 )
 from app.application.common.unit_of_work import UnitOfWork
+from backend.tests.unit.application.test_unit_of_work import FakeUnitOfWork
 
 class FakeCustomerRepository:
 
@@ -52,31 +53,21 @@ class FakeCustomerRepository:
             None,
         )
 
-
-class FakeUnitOfWork(UnitOfWork):
-
-    def __init__(self, repository):
-        self.customers = repository
-        self.commit_count = 0
-        self.rollback_count = 0
-
-    async def commit(self):
-        self.commit_count += 1
-
-    async def rollback(self):
-        self.rollback_count += 1
-
 @pytest.mark.anyio
 async def test_create_customer():
 
-    repository = FakeCustomerRepository()
+    customer_repository = FakeCustomerRepository()
 
-    uow = FakeUnitOfWork(repository)
+    uow = FakeUnitOfWork(
+        customer_repository=customer_repository,
+        transaction_repository=None,
+        customer_value_repository=None,
+    )
 
     service = CustomerService(
         uow=uow,
     )
-
+    
     random_email = (
         f"anna_{uuid.uuid4().hex[:8]}@example.com"
     )
