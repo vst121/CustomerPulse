@@ -52,7 +52,7 @@ CustomerPulse follows this conceptual flow:
                              ▼
                     ┌──────────────────┐
                     │ Personalization  │
-                    │   & Campaigns     │
+                    │   & Campaigns    │
                     └──────────────────┘
 ```
 
