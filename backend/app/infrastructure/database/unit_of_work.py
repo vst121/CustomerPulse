@@ -1,0 +1,29 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.application.common.unit_of_work import UnitOfWork
+from app.infrastructure.database.repositories.customer_repository import (
+    PostgresCustomerRepository,
+)
+from app.infrastructure.database.repositories.transaction_repository import (
+    PostgresTransactionRepository,
+)
+
+
+class PostgresUnitOfWork(UnitOfWork):
+
+    def __init__(self, session: AsyncSession):
+        self._session = session
+
+        self.customers = PostgresCustomerRepository(
+            session
+        )
+
+        self.transactions = PostgresTransactionRepository(
+            session
+        )
+
+    async def commit(self) -> None:
+        await self._session.commit()
+
+    async def rollback(self) -> None:
+        await self._session.rollback()

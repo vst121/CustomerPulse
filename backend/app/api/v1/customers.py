@@ -9,9 +9,7 @@ from app.application.customers.customer_service import (
 )
 from app.domain.customers.entities import LifecycleStage
 from app.infrastructure.database.database import get_db_session
-from app.infrastructure.database.repositories.customer_repository import (
-    PostgresCustomerRepository,
-)
+from app.infrastructure.database.unit_of_work import PostgresUnitOfWork
 from app.schemas.customers import (
     CreateCustomerRequest,
     CustomerListResponse,
@@ -29,11 +27,11 @@ def get_customer_service(
     session: AsyncSession = Depends(get_db_session),
 ) -> CustomerService:
 
-    customer_repository = PostgresCustomerRepository(session)
+    uow = PostgresUnitOfWork(session)
 
     return CustomerService(
-        customer_repository=customer_repository,
-        session=session,
+        customer_repository=uow.customers,
+        uow=uow,
     )
 
 

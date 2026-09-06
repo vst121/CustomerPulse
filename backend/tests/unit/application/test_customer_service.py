@@ -5,18 +5,8 @@ import pytest
 
 from app.domain.customers.entities import Customer
 from app.application.customers.customer_service import (
-    CustomerAlreadyExistsError,
     CustomerService,
 )
-
-
-class FakeSession:
-
-    def __init__(self):
-        self.commit_count = 0
-
-    async def commit(self):
-        self.commit_count += 1
 
 
 class FakeCustomerRepository:
@@ -63,15 +53,33 @@ class FakeCustomerRepository:
         )
 
 
+class FakeUnitOfWork:
+
+    def __init__(
+        self,
+        repository: FakeCustomerRepository,
+    ):
+        self.customers = repository
+        self.commit_count = 0
+        self.rollback_count = 0
+
+    async def commit(self) -> None:
+        self.commit_count += 1
+
+    async def rollback(self) -> None:
+        self.rollback_count += 1
+
+
 @pytest.mark.anyio
 async def test_create_customer():
 
-    customer_repository = FakeCustomerRepository()
-    session = FakeSession()
+    repository = FakeCustomerRepository()
+
+    uow = FakeUnitOfWork(repository)
 
     service = CustomerService(
-        customer_repository=customer_repository,
-        session=session,
+        customer_repository=repository,
+        uow=uow,
     )
 
     random_email = (
@@ -85,6 +93,7 @@ async def test_create_customer():
     )
 
     assert customer.first_name == "Anna"
+
     assert customer.lifecycle_stage.value == "ACQUISITION"
 
-    assert session.commit_count == 1
+    assert uow.commit_count == 1

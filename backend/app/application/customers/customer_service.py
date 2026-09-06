@@ -1,13 +1,12 @@
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.customers.entities import (
     Customer,
     LifecycleStage,
 )
 from app.domain.customers.repositories import CustomerRepository
-
+from app.application.common.unit_of_work import UnitOfWork
 
 class CustomerAlreadyExistsError(Exception):
     pass
@@ -18,10 +17,10 @@ class CustomerService:
     def __init__(
         self,
         customer_repository: CustomerRepository,
-        session: AsyncSession,
+        uow: UnitOfWork,
     ):
         self.customer_repository = customer_repository
-        self.session = session
+        self.uow = uow
 
     async def create_customer(
         self,
@@ -45,7 +44,7 @@ class CustomerService:
         )
 
         created_customer = await self.customer_repository.add(customer)
-        await self.session.commit()
+        await self.uow.commit()
 
         return created_customer
 
