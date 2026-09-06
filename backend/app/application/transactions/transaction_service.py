@@ -8,6 +8,7 @@ from app.domain.transactions.entities import (
     TransactionCategory,
     TransactionStatus,
 )
+from backend.app.application.exceptions import CustomerNotFoundError
 
 
 class TransactionService:
@@ -36,9 +37,7 @@ class TransactionService:
             )
 
             if customer is None:
-                raise ValueError(
-                    f"Customer '{customer_id}' was not found."
-                )
+                raise CustomerNotFoundError(customer_id)
 
             existing = (
                 await self.uow.transactions.get_by_idempotency_key(
@@ -67,8 +66,8 @@ class TransactionService:
 
             await self.uow.commit()
 
-            return transaction    
-        
+            return transaction
+                
     async def get_transaction(
         self,
         transaction_id: UUID,

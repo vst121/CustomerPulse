@@ -50,10 +50,6 @@ async def create_transaction(
             uow=uow,
         )
 
-        service = TransactionService(
-            uow=uow,
-        )
-
         return await service.create_transaction(
             customer_id=customer_id,
             amount=Decimal("100.00"),
