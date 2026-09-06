@@ -29,44 +29,46 @@ class TransactionService:
         idempotency_key: str,
     ) -> Transaction:
 
-        customer = await self.uow.customers.get_by_id(
-            customer_id
-        )
+        async with self.uow:
 
-        if customer is None:
-            raise ValueError(
-                f"Customer '{customer_id}' was not found."
+            customer = await self.uow.customers.get_by_id(
+                customer_id
             )
 
-        existing = (
-            await self.uow.transactions.get_by_idempotency_key(
+            if customer is None:
+                raise ValueError(
+                    f"Customer '{customer_id}' was not found."
+                )
+
+            existing = (
+                await self.uow.transactions.get_by_idempotency_key(
+                    customer_id=customer_id,
+                    idempotency_key=idempotency_key,
+                )
+            )
+
+            if existing is not None:
+                return existing
+
+            transaction = Transaction(
+                id=uuid4(),
                 customer_id=customer_id,
+                amount=amount,
+                currency=currency,
+                category=category,
+                status=status,
+                timestamp=timestamp,
                 idempotency_key=idempotency_key,
             )
-        )
 
-        if existing is not None:
-            return existing
+            transaction = await self.uow.transactions.add(
+                transaction
+            )
 
-        transaction = Transaction(
-            id=uuid4(),
-            customer_id=customer_id,
-            amount=amount,
-            currency=currency,
-            category=category,
-            status=status,
-            timestamp=timestamp,
-            idempotency_key=idempotency_key,
-        )
+            await self.uow.commit()
 
-        transaction = await self.uow.transactions.add(
-            transaction
-        )
-
-        await self.uow.commit()
-
-        return transaction
-    
+            return transaction    
+        
     async def get_transaction(
         self,
         transaction_id: UUID,

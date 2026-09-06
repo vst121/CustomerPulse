@@ -7,7 +7,7 @@ from app.domain.customers.entities import Customer
 from app.application.customers.customer_service import (
     CustomerService,
 )
-
+from app.application.common.unit_of_work import UnitOfWork
 
 class FakeCustomerRepository:
 
@@ -53,22 +53,18 @@ class FakeCustomerRepository:
         )
 
 
-class FakeUnitOfWork:
+class FakeUnitOfWork(UnitOfWork):
 
-    def __init__(
-        self,
-        repository: FakeCustomerRepository,
-    ):
+    def __init__(self, repository):
         self.customers = repository
         self.commit_count = 0
         self.rollback_count = 0
 
-    async def commit(self) -> None:
+    async def commit(self):
         self.commit_count += 1
 
-    async def rollback(self) -> None:
+    async def rollback(self):
         self.rollback_count += 1
-
 
 @pytest.mark.anyio
 async def test_create_customer():

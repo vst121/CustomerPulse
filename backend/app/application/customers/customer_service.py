@@ -26,24 +26,32 @@ class CustomerService:
         email: str,
     ) -> Customer:
 
-        if await self.uow.customers.exists_by_email(email):
-            raise CustomerAlreadyExistsError(email)
+        async with self.uow:
 
-        customer = Customer(
-            id=uuid4(),
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            lifecycle_stage=LifecycleStage.ACQUISITION,
-            created_at=datetime.now(timezone.utc),
-        )
+            exists = await self.uow.customers.exists_by_email(
+                email
+            )
 
-        await self.uow.customers.add(customer)
+            if exists:
+                raise CustomerAlreadyExistsError(email)
 
-        await self.uow.commit()
+            customer = Customer(
+                id=uuid4(),
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                lifecycle_stage=LifecycleStage.ACQUISITION,
+                created_at=datetime.now(timezone.utc),
+            )
 
-        return customer
-    
+            customer = await self.uow.customers.add(
+                customer
+            )
+
+            await self.uow.commit()
+
+            return customer
+        
     async def get_customer(
         self,
         customer_id: UUID,
