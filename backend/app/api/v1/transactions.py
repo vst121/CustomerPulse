@@ -8,28 +8,21 @@ from fastapi import (
     Header,
     status,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.application.transactions.transaction_service import (
     TransactionService,
 )
 from app.infrastructure.database.database import get_db_session
-from app.infrastructure.database.repositories.customer_repository import (
-    PostgresCustomerRepository,
-)
-from app.infrastructure.database.repositories.transaction_repository import (
-    PostgresTransactionRepository,
-)
 from app.schemas.transactions import (
     CreateTransactionRequest,
     TransactionListResponse,
     TransactionResponse,
 )
 
+from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(
-    prefix="/transactions",
-    tags=["Transactions"],
+from app.infrastructure.database.database import get_db_session
+from app.infrastructure.database.unit_of_work import (
+    PostgresUnitOfWork,
 )
 
 
@@ -37,19 +30,16 @@ def get_transaction_service(
     session: AsyncSession = Depends(get_db_session),
 ) -> TransactionService:
 
-    transaction_repository = PostgresTransactionRepository(
-        session
-    )
-
-    customer_repository = PostgresCustomerRepository(
-        session
-    )
+    uow = PostgresUnitOfWork(session)
 
     return TransactionService(
-        transaction_repository=transaction_repository,
-        customer_repository=customer_repository,
-        session=session,
+        uow=uow,
     )
+
+router = APIRouter(
+    prefix="/transactions",
+    tags=["Transactions"],
+)
 
 @router.post(
     "/customers/{customer_id}",

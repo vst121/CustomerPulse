@@ -18,13 +18,9 @@ from app.infrastructure.database.models import (
     CustomerModel,
     TransactionModel,
 )
-from app.infrastructure.database.repositories.customer_repository import (
-    PostgresCustomerRepository,
+from app.infrastructure.database.unit_of_work import (
+    PostgresUnitOfWork,
 )
-from app.infrastructure.database.repositories.transaction_repository import (
-    PostgresTransactionRepository,
-)
-
 
 async def get_test_customer_id() -> UUID:
     async with AsyncSessionLocal() as session:
@@ -48,18 +44,14 @@ async def create_transaction(
 ):
     async with AsyncSessionLocal() as session:
 
-        transaction_repository = (
-            PostgresTransactionRepository(session)
-        )
+        uow = PostgresUnitOfWork(session)
 
-        customer_repository = (
-            PostgresCustomerRepository(session)
+        service = TransactionService(
+            uow=uow,
         )
 
         service = TransactionService(
-            transaction_repository=transaction_repository,
-            customer_repository=customer_repository,
-            session=session,
+            uow=uow,
         )
 
         return await service.create_transaction(

@@ -1,53 +1,47 @@
 from datetime import datetime
 from decimal import Decimal
 from uuid import UUID, uuid4
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.exceptions import CustomerNotFoundError
-from app.domain.customers.repositories import CustomerRepository
+from app.application.common.unit_of_work import UnitOfWork
 from app.domain.transactions.entities import (
     Transaction,
     TransactionCategory,
     TransactionStatus,
 )
-from app.domain.transactions.repositories import TransactionRepository
 
 
 class TransactionService:
 
     def __init__(
         self,
-        transaction_repository: TransactionRepository,
-        customer_repository: CustomerRepository,
-        session: AsyncSession,
+        uow: UnitOfWork,
     ):
-        self.transaction_repository = transaction_repository
-        self.customer_repository = customer_repository
-        self.session = session
-        
+        self.uow = uow
+
     async def create_transaction(
         self,
         customer_id: UUID,
-        idempotency_key: str,
         amount: Decimal,
         currency: str,
         category: TransactionCategory,
         status: TransactionStatus,
         timestamp: datetime,
+        idempotency_key: str,
     ) -> Transaction:
 
-        customer_exists = await self.customer_repository.exists(
+        customer = await self.uow.customers.get_by_id(
             customer_id
         )
 
-        if not customer_exists:
-            raise CustomerNotFoundError(customer_id)
+        if customer is None:
+            raise ValueError(
+                f"Customer '{customer_id}' was not found."
+            )
 
-        existing = await (
-            self.transaction_repository
-            .get_by_idempotency_key(
-                customer_id,
-                idempotency_key,
+        existing = (
+            await self.uow.transactions.get_by_idempotency_key(
+                customer_id=customer_id,
+                idempotency_key=idempotency_key,
             )
         )
 
@@ -57,22 +51,22 @@ class TransactionService:
         transaction = Transaction(
             id=uuid4(),
             customer_id=customer_id,
-            idempotency_key=idempotency_key,
             amount=amount,
-            currency=currency.upper(),
+            currency=currency,
             category=category,
             status=status,
             timestamp=timestamp,
+            idempotency_key=idempotency_key,
         )
 
-        created_transaction = (
-            await self.transaction_repository.add(transaction)
+        transaction = await self.uow.transactions.add(
+            transaction
         )
 
-        await self.session.commit()
+        await self.uow.commit()
 
-        return created_transaction
-
+        return transaction
+    
     async def get_transaction(
         self,
         transaction_id: UUID,
