@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.scoring.entities import CustomerScore
@@ -9,7 +10,6 @@ from app.infrastructure.database.models import CustomerScoreModel
 
 
 class PostgresCustomerScoreRepository(CustomerScoreRepository):
-
     def __init__(self, session: AsyncSession):
         self._session = session
 
@@ -34,29 +34,47 @@ class PostgresCustomerScoreRepository(CustomerScoreRepository):
         self,
         customer_score: CustomerScore,
     ) -> CustomerScore:
-        model = CustomerScoreModel(
-            customer_id=customer_score.customer_id,
-            score=customer_score.score,
+        statement = (
+            insert(CustomerScoreModel)
+            .values(
+                customer_id=customer_score.customer_id,
+                score=customer_score.score,
+            )
+            .on_conflict_do_update(
+                index_elements=[CustomerScoreModel.customer_id],
+                set_={
+                    "score": customer_score.score,
+                },
+            )
+            .returning(
+                CustomerScoreModel.customer_id,
+                CustomerScoreModel.score,
+            )
         )
 
-        self._session.add(model)
+        result = await self._session.execute(statement)
 
-        await self._session.flush()
+        row = result.one()
 
-        return self._to_domain(model)
+        return CustomerScore(
+            customer_id=row.customer_id,
+            score=row.score,
+        )
 
     async def update(
         self,
         customer_score: CustomerScore,
     ) -> CustomerScore:
-        result = await self._session.execute(
-            select(CustomerScoreModel).where(
-                CustomerScoreModel.customer_id
-                == customer_score.customer_id
-            )
+        model = await self._session.get(
+            CustomerScoreModel,
+            customer_score.customer_id,
         )
 
-        model = result.scalar_one()
+        if model is None:
+            raise ValueError(
+                f"Customer score for '{customer_score.customer_id}' "
+                "was not found."
+            )
 
         model.score = customer_score.score
 

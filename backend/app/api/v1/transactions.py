@@ -24,7 +24,10 @@ from app.infrastructure.database.database import get_db_session
 from app.infrastructure.database.unit_of_work import (
     PostgresUnitOfWork,
 )
-
+from app.application.scoring.customer_scoring_scheduler import (
+    CustomerScoringScheduler,
+)
+from app.application.common.application_runtime import background_worker
 
 def get_transaction_service(
     session: AsyncSession = Depends(get_db_session),
@@ -32,8 +35,13 @@ def get_transaction_service(
 
     uow = PostgresUnitOfWork(session)
 
+    scoring_scheduler = CustomerScoringScheduler(
+        worker=background_worker,
+    )
+
     return TransactionService(
         uow=uow,
+        scoring_scheduler=scoring_scheduler,
     )
 
 router = APIRouter(

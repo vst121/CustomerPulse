@@ -6,7 +6,6 @@ from app.domain.scoring.entities import CustomerScore
 
 
 class CustomerScoringService:
-
     def __init__(self, uow: UnitOfWork):
         self.uow = uow
 
@@ -46,24 +45,11 @@ class CustomerScoringService:
                 score=score,
             )
 
-            existing = (
-                await self.uow.customer_scores.get_by_customer_id(
-                    customer_id
+            customer_score = (
+                await self.uow.customer_scores.add(
+                    customer_score
                 )
             )
-
-            if existing is None:
-                customer_score = (
-                    await self.uow.customer_scores.add(
-                        customer_score
-                    )
-                )
-            else:
-                customer_score = (
-                    await self.uow.customer_scores.update(
-                        customer_score
-                    )
-                )
 
             await self.uow.commit()
 

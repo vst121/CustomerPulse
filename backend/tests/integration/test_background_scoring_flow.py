@@ -1,3 +1,4 @@
+import time
 import uuid
 from decimal import Decimal
 
@@ -6,17 +7,14 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-def test_completed_transaction_updates_customer_value() -> None:
+def test_completed_transaction_triggers_background_scoring() -> None:
     with TestClient(app) as client:
-        email = (
-            f"value_{uuid.uuid4().hex[:8]}"
-            "@example.com"
-        )
+        email = f"background_{uuid.uuid4().hex[:8]}@example.com"
 
         customer_response = client.post(
             "/api/v1/customers",
             json={
-                "first_name": "Value",
+                "first_name": "Background",
                 "last_name": "Test",
                 "email": email,
             },
@@ -29,10 +27,10 @@ def test_completed_transaction_updates_customer_value() -> None:
         transaction_response = client.post(
             f"/api/v1/transactions/customers/{customer_id}",
             headers={
-                "Idempotency-Key": f"value-{uuid.uuid4()}",
+                "Idempotency-Key": f"background-{uuid.uuid4()}",
             },
             json={
-                "amount": "250.00",
+                "amount": "100.00",
                 "currency": "EUR",
                 "category": "GROCERIES",
                 "status": "COMPLETED",
@@ -42,21 +40,23 @@ def test_completed_transaction_updates_customer_value() -> None:
 
         assert transaction_response.status_code == 201
 
-        customer_360_response = client.get(
-            f"/api/v1/customers/{customer_id}/360"
-        )
+        deadline = time.monotonic() + 5
 
-        assert customer_360_response.status_code == 200
+        while time.monotonic() < deadline:
+            customer_360_response = client.get(
+                f"/api/v1/customers/{customer_id}/360"
+            )
 
-        data = customer_360_response.json()
+            assert customer_360_response.status_code == 200
 
-        assert len(data["transactions"]) == 1
+            data = customer_360_response.json()
 
-        assert Decimal(
-            data["value"]["total_spend"]
-        ) == Decimal("250.00")
+            if Decimal(data["score"]["score"]) == Decimal("55.00"):
+                return
 
-        assert (
-            data["value"]["transaction_count"]
-            == 1
+            time.sleep(0.05)
+
+        raise AssertionError(
+            "Background scoring did not produce the expected score "
+            "within 5 seconds."
         )
