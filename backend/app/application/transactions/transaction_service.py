@@ -16,9 +16,11 @@ class TransactionService:
     def __init__(
         self,
         uow: UnitOfWork,
+        scoring_scheduler=None,
     ):
         self.uow = uow
-
+        self.scoring_scheduler = scoring_scheduler
+        
     async def create_transaction(
         self,
         customer_id: UUID,
@@ -79,6 +81,14 @@ class TransactionService:
                     await self.uow.customer_values.update(customer_value)
 
             await self.uow.commit()
+
+            if (
+                status == TransactionStatus.COMPLETED
+                and self.scoring_scheduler is not None
+            ):
+                await self.scoring_scheduler.schedule(
+                    customer_id
+                )
 
             return transaction
 
