@@ -23,8 +23,15 @@ class BackgroundJobRequest:
 
 
 class BackgroundWorker:
-    def __init__(self, max_queue_size: int = 1000):
+    def __init__(
+        self,
+        max_queue_size: int = 1000,
+        max_retries: int = 3,
+        retry_delay: float = 0.1,
+    ):        
         self._max_queue_size = max_queue_size
+        self._max_retries = max_retries
+        self._retry_delay = retry_delay
         self._queue: asyncio.Queue[BackgroundJobRequest] | None = None
         self._task: asyncio.Task[None] | None = None
         self._state = BackgroundWorkerState.STOPPED
@@ -101,11 +108,38 @@ class BackgroundWorker:
             request = await self._queue.get()
 
             try:
-                await request.job.execute(request.payload)
-            except Exception:
-                logger.exception(
-                    "Background job execution failed."
-                )
+                attempt = 0
+
+                while True:
+                    try:
+                        await request.job.execute(request.payload)
+                        break
+
+                    except asyncio.CancelledError:
+                        raise
+
+                    except Exception:
+                        attempt += 1
+
+                        if attempt > self._max_retries:
+                            logger.exception(
+                                "Background job failed after %s retries.",
+                                self._max_retries,
+                            )
+                            break
+
+                        delay = self._retry_delay * (2 ** (attempt - 1))
+
+                        logger.exception(
+                            "Background job failed. Retrying "
+                            "(attempt %s/%s) in %.2f seconds.",
+                            attempt,
+                            self._max_retries,
+                            delay,
+                        )
+
+                        await asyncio.sleep(delay)
+
             finally:
                 self._queue.task_done()
 
