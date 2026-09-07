@@ -5,7 +5,9 @@ from enum import StrEnum
 from typing import Any
 
 from app.application.common.background_job import BackgroundJob
-
+from app.application.common.background_worker_options import (
+    BackgroundWorkerOptions,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,15 +33,9 @@ class BackgroundWorkerMetrics:
 class BackgroundWorker:
     def __init__(
         self,
-        max_queue_size: int = 1000,
-        max_retries: int = 3,
-        retry_delay: float = 0.1,
-        shutdown_timeout: float = 30.0,        
+        options: BackgroundWorkerOptions | None = None,
     ):        
-        self._max_queue_size = max_queue_size
-        self._max_retries = max_retries
-        self._retry_delay = retry_delay
-        self._shutdown_timeout = shutdown_timeout
+        self._options = options or BackgroundWorkerOptions()
         self._queue: asyncio.Queue[BackgroundJobRequest] | None = None
         self._task: asyncio.Task[None] | None = None
         self._state = BackgroundWorkerState.STOPPED
@@ -58,7 +54,7 @@ class BackgroundWorker:
             )
 
         self._queue = asyncio.Queue(
-            maxsize=self._max_queue_size
+            maxsize=self._options.max_queue_size
         )
 
         self._task = asyncio.create_task(self._run())
@@ -77,12 +73,12 @@ class BackgroundWorker:
             try:
                 await asyncio.wait_for(
                     self._queue.join(),
-                    timeout=self._shutdown_timeout,
+                    timeout=self._options.shutdown_timeout,
                 )
             except asyncio.TimeoutError:
                 logger.warning(
                     "BackgroundWorker shutdown timed out after %.2f seconds.",
-                    self._shutdown_timeout,
+                    self._options.shutdown_timeout,
                 )
 
         if self._task is not None:
@@ -147,19 +143,19 @@ class BackgroundWorker:
                     except Exception:
                         attempt += 1
 
-                        if attempt > self._max_retries:
+                        if attempt > self._options.max_retries:
                             self._jobs_failed += 1
 
                             logger.exception(
                                 "Background job failed after %s retries.",
-                                self._max_retries,
+                                self._options.max_retries,
                             )
 
                             break
 
                         self._jobs_retried += 1
 
-                        delay = self._retry_delay * (
+                        delay = self._options.retry_delay * (
                             2 ** (attempt - 1)
                         )
 
@@ -167,7 +163,7 @@ class BackgroundWorker:
                             "Background job failed. Retrying "
                             "(attempt %s/%s) in %.2f seconds.",
                             attempt,
-                            self._max_retries,
+                            self._options.max_retries,
                             delay,
                         )
 

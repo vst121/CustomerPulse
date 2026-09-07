@@ -2,6 +2,7 @@ import pytest
 
 from app.application.common.background_job import BackgroundJob
 from app.application.common.background_worker import BackgroundWorker
+from backend.app.application.common.background_worker_options import BackgroundWorkerOptions
 
 
 class SuccessfulJob(BackgroundJob):
@@ -51,8 +52,10 @@ async def test_successful_job_updates_metrics() -> None:
 @pytest.mark.asyncio
 async def test_retry_updates_retry_metrics() -> None:
     worker = BackgroundWorker(
-        max_retries=3,
-        retry_delay=0,
+        options=BackgroundWorkerOptions(
+            max_retries=3,
+            retry_delay=0,
+        ),
     )
 
     job = EventuallySuccessfulJob()
@@ -79,8 +82,10 @@ async def test_retry_updates_retry_metrics() -> None:
 @pytest.mark.asyncio
 async def test_permanent_failure_updates_failure_metrics() -> None:
     worker = BackgroundWorker(
-        max_retries=3,
-        retry_delay=0,
+        options=BackgroundWorkerOptions(
+            max_retries=3,
+            retry_delay=0,
+        ),
     )
 
     await worker.start()

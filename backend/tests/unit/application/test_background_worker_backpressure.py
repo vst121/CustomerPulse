@@ -4,6 +4,7 @@ import pytest
 
 from app.application.common.background_job import BackgroundJob
 from app.application.common.background_worker import BackgroundWorker
+from backend.app.application.common.background_worker_options import BackgroundWorkerOptions
 
 
 class BlockingJob(BackgroundJob):
@@ -27,7 +28,9 @@ class SuccessfulJob(BackgroundJob):
 @pytest.mark.asyncio
 async def test_enqueue_waits_when_queue_is_full() -> None:
     worker = BackgroundWorker(
-        max_queue_size=1,
+        options=BackgroundWorkerOptions(
+            max_queue_size=1,
+        ),  
     )
 
     blocking_job = BlockingJob()

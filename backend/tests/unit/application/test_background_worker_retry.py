@@ -4,6 +4,7 @@ import pytest
 
 from app.application.common.background_job import BackgroundJob
 from app.application.common.background_worker import BackgroundWorker
+from backend.app.application.common.background_worker_options import BackgroundWorkerOptions
 
 
 class FailingJob(BackgroundJob):
@@ -36,7 +37,11 @@ class BlockingRetryJob(BackgroundJob):
 
 @pytest.mark.asyncio
 async def test_failed_job_is_retried_and_eventually_succeeds() -> None:
-    worker = BackgroundWorker(max_retries=3)
+    worker = BackgroundWorker(
+        options=BackgroundWorkerOptions(
+            max_retries=3,
+        ),
+    )
     job = EventuallySuccessfulJob(failures_before_success=2)
 
     await worker.start()
@@ -52,7 +57,11 @@ async def test_failed_job_is_retried_and_eventually_succeeds() -> None:
 
 @pytest.mark.asyncio
 async def test_failed_job_stops_after_max_retries() -> None:
-    worker = BackgroundWorker(max_retries=3)
+    worker = BackgroundWorker(
+        options=BackgroundWorkerOptions(
+            max_retries=3,
+        ),
+    )
     job = FailingJob()
 
     await worker.start()
@@ -68,8 +77,10 @@ async def test_failed_job_stops_after_max_retries() -> None:
 @pytest.mark.asyncio
 async def test_failed_job_uses_exponential_backoff() -> None:
     worker = BackgroundWorker(
-        max_retries=2,
-        retry_delay=0.05,
+        options=BackgroundWorkerOptions(
+            max_retries=2,
+            retry_delay=0.05,
+        ),
     )
 
     job = FailingJob()
@@ -94,9 +105,11 @@ async def test_failed_job_uses_exponential_backoff() -> None:
 @pytest.mark.asyncio
 async def test_shutdown_timeout_cancels_long_retry_backoff() -> None:
     worker = BackgroundWorker(
-        max_retries=10,
-        retry_delay=10.0,
-        shutdown_timeout=0.1,
+        options=BackgroundWorkerOptions(
+            max_retries=10,
+            retry_delay=10.0,
+            shutdown_timeout=0.1,
+        ),
     )
 
     job = BlockingRetryJob()
