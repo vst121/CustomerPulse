@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { apiClient } from "@/services/api/client";
+import { getCustomer } from "@/services/api/customers";
 import type { Customer } from "@/types/customer";
 
 type CustomerPageProps = {
@@ -24,9 +24,7 @@ export default function CustomerPage({ params }: CustomerPageProps) {
 
         setCustomerId(customerId);
 
-        const response = await apiClient<Customer>(
-          `/api/v1/customers/${customerId}`,
-        );
+        const response = await getCustomer(customerId);
 
         setCustomer(response);
       } catch (err) {

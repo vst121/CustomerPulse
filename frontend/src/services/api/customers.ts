@@ -1,8 +1,10 @@
 import { apiClient } from "./client";
 import type {
+  Customer,
   CustomerListResponse,
   LifecycleStage,
 } from "@/types/customer";
+import type { Customer360 } from "@/types/customer360";
 
 export type GetCustomersParams = {
   page?: number;
@@ -36,5 +38,21 @@ export async function getCustomers(
 
   return apiClient<CustomerListResponse>(
     `/api/v1/customers${query ? `?${query}` : ""}`,
+  );
+}
+
+export async function getCustomer(
+  customerId: string,
+): Promise<Customer> {
+  return apiClient<Customer>(
+    `/api/v1/customers/${customerId}`,
+  );
+}
+
+export async function getCustomer360(
+  customerId: string,
+): Promise<Customer360> {
+  return apiClient<Customer360>(
+    `/api/v1/customers/${customerId}/360`,
   );
 }
