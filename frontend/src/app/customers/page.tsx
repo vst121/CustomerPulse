@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { getCustomers } from "@/services/api/customers";
 import type { Customer, LifecycleStage } from "@/types/customer";
 
+import LoadingState from "@/components/ui/LoadingState";
+
 const PAGE_SIZE = 10;
 
 const lifecycleStages: LifecycleStage[] = [
@@ -158,8 +160,8 @@ export default function CustomersPage() {
           {/* Loading */}
 
           {loading && (
-            <div className="px-6 py-12 text-center text-sm text-slate-500">
-              Loading customers...
+            <div className="px-6">
+              <LoadingState message="Loading customers..." />
             </div>
           )}
 

@@ -8,6 +8,9 @@ import { getCustomer } from "@/services/api/customers";
 import type { Customer } from "@/types/customer";
 import type { CustomerIntelligence } from "@/types/customerIntelligence";
 
+import LoadingState from "@/components/ui/LoadingState";
+import ErrorState from "@/components/ui/ErrorState";
+
 type IntelligencePageProps = {
   params: Promise<{
     customerId: string;
@@ -68,9 +71,7 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 p-8">
-        <p className="text-sm text-slate-500">
-          Loading customer intelligence...
-        </p>
+        <LoadingState message="Loading customer intelligence..." />
       </main>
     );
   }
@@ -78,15 +79,10 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
   if (error || !customer || !intelligence) {
     return (
       <main className="min-h-screen bg-slate-50 p-8">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6">
-          <h1 className="font-semibold text-red-900">
-            Unable to load customer intelligence
-          </h1>
-
-          <p className="mt-2 text-sm text-red-700">
-            {error ?? "Customer intelligence is unavailable."}
-          </p>
-        </div>
+        <ErrorState
+          title="Unable to load customer intelligence"
+          message={error ?? "Customer intelligence is unavailable."}
+        />
       </main>
     );
   }

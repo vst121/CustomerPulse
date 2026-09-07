@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 import { getCustomer } from "@/services/api/customers";
 import type { Customer } from "@/types/customer";
 
+import LoadingState from "@/components/ui/LoadingState";
+import ErrorState from "@/components/ui/ErrorState";
+
 type CustomerPageProps = {
   params: Promise<{
     customerId: string;
@@ -12,7 +15,6 @@ type CustomerPageProps = {
 };
 
 export default function CustomerPage({ params }: CustomerPageProps) {
-  const [customerId, setCustomerId] = useState<string | null>(null);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,8 +23,6 @@ export default function CustomerPage({ params }: CustomerPageProps) {
     async function loadCustomer() {
       try {
         const { customerId } = await params;
-
-        setCustomerId(customerId);
 
         const response = await getCustomer(customerId);
 
@@ -42,7 +42,7 @@ export default function CustomerPage({ params }: CustomerPageProps) {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 p-8">
-        <div className="text-sm text-slate-500">Loading customer...</div>
+        <LoadingState message="Loading customer..." />
       </main>
     );
   }
@@ -50,21 +50,10 @@ export default function CustomerPage({ params }: CustomerPageProps) {
   if (error || !customer) {
     return (
       <main className="min-h-screen bg-slate-50 p-8">
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6">
-          <h1 className="font-semibold text-red-900">
-            Unable to load customer
-          </h1>
-
-          <p className="mt-2 text-sm text-red-700">
-            {error ?? "Customer not found."}
-          </p>
-
-          {customerId && (
-            <p className="mt-2 text-xs text-red-600">
-              Customer ID: {customerId}
-            </p>
-          )}
-        </div>
+        <ErrorState
+          title="Unable to load customer"
+          message={error ?? "Customer not found."}
+        />
       </main>
     );
   }
