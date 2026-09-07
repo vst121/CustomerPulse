@@ -1,6 +1,10 @@
 from decimal import Decimal
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
+from uuid import UUID
 
+import pytest
+
+from app.application.common.unit_of_work import UnitOfWork
 from app.application.recommendations.customer_decision_engine import (
     CustomerDecisionEngine,
 )
@@ -13,21 +17,37 @@ from app.application.scoring.customer_feature_extractor import (
 from app.application.scoring.customer_intelligence_service import (
     CustomerIntelligenceService,
 )
-from app.application.scoring.deterministic_customer_predictor import (
-    DeterministicCustomerPredictor,
-)
-from app.domain.recommendations.next_best_action import (
-    NextBestActionType,
-)
+from app.application.scoring.customer_predictor import CustomerPredictor
 from app.domain.scoring.customer_features import CustomerFeatures
 from app.domain.scoring.customer_prediction import CustomerPrediction
 
 
-def test_customer_intelligence_service_orchestrates_prediction_pipeline() -> None:
-    feature_extractor = Mock(spec=CustomerFeatureExtractor)
-    predictor = Mock(spec=DeterministicCustomerPredictor)
-    decision_engine = Mock(spec=CustomerDecisionEngine)
-    action_service = Mock(spec=NextBestActionService)
+@pytest.mark.asyncio
+async def test_customer_intelligence_service_orchestrates_pipeline() -> None:
+    customer_id = UUID(
+        "11111111-1111-1111-1111-111111111111"
+    )
+
+    transaction_repository = Mock()
+    transaction_repository.get_all_by_customer_id = AsyncMock(
+        return_value=[]
+    )
+
+    uow = Mock(spec=UnitOfWork)
+    uow.transactions = transaction_repository
+
+    feature_extractor = Mock(
+        spec=CustomerFeatureExtractor
+    )
+    predictor = Mock(
+        spec=CustomerPredictor
+    )
+    decision_engine = Mock(
+        spec=CustomerDecisionEngine
+    )
+    action_service = Mock(
+        spec=NextBestActionService
+    )
 
     features = CustomerFeatures(
         transaction_count=5,
@@ -41,9 +61,7 @@ def test_customer_intelligence_service_orchestrates_prediction_pipeline() -> Non
     )
 
     decision = Mock()
-
     action = Mock()
-    action.action_type = NextBestActionType.NO_ACTION
 
     feature_extractor.extract.return_value = features
     predictor.predict.return_value = prediction
@@ -51,17 +69,22 @@ def test_customer_intelligence_service_orchestrates_prediction_pipeline() -> Non
     action_service.determine.return_value = action
 
     service = CustomerIntelligenceService(
+        uow=uow,
         feature_extractor=feature_extractor,
         predictor=predictor,
         decision_engine=decision_engine,
         action_service=action_service,
     )
 
-    result = service.analyze([])
+    result = await service.analyze(customer_id)
 
     assert result.features == features
     assert result.prediction == prediction
     assert result.action == action
+
+    transaction_repository.get_all_by_customer_id.assert_awaited_once_with(
+        customer_id
+    )
 
     feature_extractor.extract.assert_called_once_with([])
     predictor.predict.assert_called_once_with(features)
