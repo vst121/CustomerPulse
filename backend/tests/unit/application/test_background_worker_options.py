@@ -29,3 +29,9 @@ def test_invalid_options_are_rejected(
 ) -> None:
     with pytest.raises(ValueError):
         BackgroundWorkerOptions(**kwargs)
+
+def test_options_are_immutable() -> None:
+    options = BackgroundWorkerOptions()
+
+    with pytest.raises(AttributeError):
+        options.max_retries = 10        
