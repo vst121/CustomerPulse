@@ -1,11 +1,14 @@
 import { apiClient } from "./client";
-import type { CustomerListResponse } from "@/types/customer";
+import type {
+  CustomerListResponse,
+  LifecycleStage,
+} from "@/types/customer";
 
 export type GetCustomersParams = {
   page?: number;
   page_size?: number;
   search?: string;
-  lifecycle_stage?: string;
+  lifecycle_stage?: LifecycleStage;
 };
 
 export async function getCustomers(
