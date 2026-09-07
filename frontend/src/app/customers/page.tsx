@@ -1,12 +1,8 @@
 "use client";
-
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { getCustomers } from "@/services/api/customers";
-import type {
-  Customer,
-  LifecycleStage,
-} from "@/types/customer";
+import type { Customer, LifecycleStage } from "@/types/customer";
 
 const PAGE_SIZE = 10;
 
@@ -26,51 +22,62 @@ export default function CustomersPage() {
   const [total, setTotal] = useState(0);
 
   const [search, setSearch] = useState("");
-  const [lifecycleStage, setLifecycleStage] =
-    useState<LifecycleStage | "">("");
+  const [lifecycleStage, setLifecycleStage] = useState<LifecycleStage | "">("");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const loadCustomers = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await getCustomers({
-        page,
-        page_size: PAGE_SIZE,
-        search: search.trim() || undefined,
-        lifecycle_stage: lifecycleStage || undefined,
-      });
-
-      setCustomers(response.items);
-      setTotal(response.total);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load customers.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search, lifecycleStage]);
-
   useEffect(() => {
-    void loadCustomers();
-  }, [loadCustomers]);
+    let cancelled = false;
+
+    async function fetchCustomers() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await getCustomers({
+          page,
+          page_size: PAGE_SIZE,
+          search: search.trim() || undefined,
+          lifecycle_stage: lifecycleStage || undefined,
+        });
+
+        if (cancelled) {
+          return;
+        }
+
+        setCustomers(response.items);
+        setTotal(response.total);
+      } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
+        setError(
+          err instanceof Error ? err.message : "Failed to load customers.",
+        );
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void fetchCustomers();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [page, search, lifecycleStage]);
 
   function handleSearchChange(value: string) {
     setSearch(value);
     setPage(1);
   }
 
-  function handleLifecycleChange(
-    value: LifecycleStage | "",
-  ) {
+  function handleLifecycleChange(value: LifecycleStage | "") {
     setLifecycleStage(value);
     setPage(1);
   }
@@ -91,19 +98,14 @@ export default function CustomersPage() {
 
       <section className="p-8">
         <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-
           {/* Header */}
 
           <div className="border-b border-slate-200 px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-slate-900">
-                  Customer List
-                </h2>
+                <h2 className="font-semibold text-slate-900">Customer List</h2>
 
-                <p className="mt-1 text-sm text-slate-500">
-                  {total} customers
-                </p>
+                <p className="mt-1 text-sm text-slate-500">{total} customers</p>
               </div>
 
               <button
@@ -120,9 +122,7 @@ export default function CustomersPage() {
               <input
                 type="search"
                 value={search}
-                onChange={(event) =>
-                  handleSearchChange(event.target.value)
-                }
+                onChange={(event) => handleSearchChange(event.target.value)}
                 placeholder="Search customers..."
                 className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 md:max-w-md"
               />
@@ -201,8 +201,7 @@ export default function CustomersPage() {
                       >
                         <td className="px-6 py-4">
                           <div className="font-medium text-slate-900">
-                            {customer.first_name}{" "}
-                            {customer.last_name}
+                            {customer.first_name} {customer.last_name}
                           </div>
                         </td>
 
@@ -217,9 +216,7 @@ export default function CustomersPage() {
                         </td>
 
                         <td className="px-6 py-4 text-slate-600">
-                          {new Date(
-                            customer.created_at,
-                          ).toLocaleDateString()}
+                          {new Date(customer.created_at).toLocaleDateString()}
                         </td>
 
                         <td className="px-6 py-4">
@@ -258,9 +255,7 @@ export default function CustomersPage() {
                   <button
                     type="button"
                     disabled={page <= 1}
-                    onClick={() =>
-                      setPage((current) => current - 1)
-                    }
+                    onClick={() => setPage((current) => current - 1)}
                     className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Previous
@@ -269,9 +264,7 @@ export default function CustomersPage() {
                   <button
                     type="button"
                     disabled={page >= totalPages}
-                    onClick={() =>
-                      setPage((current) => current + 1)
-                    }
+                    onClick={() => setPage((current) => current + 1)}
                     className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Next

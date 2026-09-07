@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { getCustomer } from "@/services/api/customers";
@@ -75,12 +75,12 @@ export default function CustomerPage({ params }: CustomerPageProps) {
 
       <header className="border-b border-slate-200 bg-white">
         <div className="px-8 py-6">
-          <a
+          <Link
             href="/customers"
             className="text-sm font-medium text-slate-500 hover:text-slate-900"
           >
             ← Customers
-          </a>
+          </Link>
 
           <div className="mt-4 flex items-start justify-between">
             <div>

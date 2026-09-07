@@ -1,3 +1,4 @@
+import Link from "next/link";
 export default function HomePage() {
   return (
     <main className="flex min-h-screen">
@@ -9,33 +10,33 @@ export default function HomePage() {
         </div>
 
         <nav className="space-y-1 p-4">
-          <a
+          <Link
             href="/"
             className="flex items-center rounded-lg bg-slate-100 px-4 py-3 text-sm font-medium text-slate-900"
           >
             Dashboard
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/customers"
             className="flex items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
           >
             Customers
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/transactions"
             className="flex items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
           >
             Transactions
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/recommendations"
             className="flex items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
           >
             Recommendations
-          </a>
+          </Link>
         </nav>
       </aside>
 
