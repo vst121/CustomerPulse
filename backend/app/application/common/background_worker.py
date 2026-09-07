@@ -28,10 +28,12 @@ class BackgroundWorker:
         max_queue_size: int = 1000,
         max_retries: int = 3,
         retry_delay: float = 0.1,
+        shutdown_timeout: float = 30.0,
     ):        
         self._max_queue_size = max_queue_size
         self._max_retries = max_retries
         self._retry_delay = retry_delay
+        self._shutdown_timeout = shutdown_timeout
         self._queue: asyncio.Queue[BackgroundJobRequest] | None = None
         self._task: asyncio.Task[None] | None = None
         self._state = BackgroundWorkerState.STOPPED
@@ -62,7 +64,16 @@ class BackgroundWorker:
         self._state = BackgroundWorkerState.STOPPING
 
         if self._queue is not None:
-            await self._queue.join()
+            try:
+                await asyncio.wait_for(
+                    self._queue.join(),
+                    timeout=self._shutdown_timeout,
+                )
+            except asyncio.TimeoutError:
+                logger.warning(
+                    "BackgroundWorker shutdown timed out after %.2f seconds.",
+                    self._shutdown_timeout,
+                )
 
         if self._task is not None:
             self._task.cancel()
@@ -75,7 +86,7 @@ class BackgroundWorker:
         self._task = None
         self._queue = None
         self._state = BackgroundWorkerState.STOPPED
-                
+                        
     async def enqueue(
         self,
         job: BackgroundJob,

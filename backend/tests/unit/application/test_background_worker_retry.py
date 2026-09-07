@@ -92,10 +92,11 @@ async def test_failed_job_uses_exponential_backoff() -> None:
     assert elapsed >= 0.15    
 
 @pytest.mark.asyncio
-async def test_worker_can_be_cancelled_during_retry_backoff() -> None:
+async def test_shutdown_timeout_cancels_long_retry_backoff() -> None:
     worker = BackgroundWorker(
         max_retries=10,
         retry_delay=10.0,
+        shutdown_timeout=0.1,
     )
 
     job = BlockingRetryJob()
