@@ -82,6 +82,28 @@ class PostgresTransactionRepository(TransactionRepository):
             total,
         )
 
+    async def get_all_by_customer_id(
+        self,
+        customer_id: UUID,
+    ) -> list[Transaction]:
+
+        query = (
+            select(TransactionModel)
+            .where(
+                TransactionModel.customer_id == customer_id
+            )
+            .order_by(TransactionModel.timestamp.desc())
+        )
+
+        result = await self._session.execute(query)
+
+        models = result.scalars().all()
+
+        return [
+            self._to_domain(model)
+            for model in models
+        ]
+
     async def add(
         self,
         transaction: Transaction,

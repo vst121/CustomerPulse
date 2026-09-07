@@ -23,6 +23,13 @@ class TransactionRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_all_by_customer_id(
+        self,
+        customer_id: UUID,
+    ) -> list[Transaction]:
+        pass
+
+    @abstractmethod
     async def add(
         self,
         transaction: Transaction,
