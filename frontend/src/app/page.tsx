@@ -1,4 +1,6 @@
 import Link from "next/link";
+import MetricCard from "@/components/ui/MetricCard";
+
 export default function HomePage() {
   return (
     <main className="flex min-h-screen">
@@ -63,52 +65,23 @@ export default function HomePage() {
               next best action.
             </p>
           </div>
-
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            <DashboardCard
-              title="Customers"
-              value="—"
-              description="Total customers"
+            <MetricCard
+              title="Lifecycle Stage"
+              value={customer.lifecycle_stage}
             />
 
-            <DashboardCard
-              title="Active"
-              value="—"
-              description="Active customers"
-            />
+            <MetricCard title="Customer ID" value={customer.id} />
 
-            <DashboardCard
-              title="Churn Risk"
-              value="—"
-              description="High-risk customers"
-            />
+            <MetricCard title="Email" value={customer.email} />
 
-            <DashboardCard
-              title="Recommendations"
-              value="—"
-              description="Pending actions"
+            <MetricCard
+              title="Customer Since"
+              value={new Date(customer.created_at).toLocaleDateString()}
             />
-          </div>
+          </div>{" "}
         </div>
       </section>
     </main>
-  );
-}
-
-type DashboardCardProps = {
-  title: string;
-  value: string;
-  description: string;
-};
-
-function DashboardCard({ title, value, description }: DashboardCardProps) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <p className="text-sm font-medium text-slate-500">{title}</p>
-
-      <p className="mt-3 text-3xl font-bold tracking-tight">{value}</p>
-
-      <p className="mt-2 text-sm text-slate-500">{description}</p>
-    </div>
   );
 }

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { getCustomers } from "@/services/api/customers";
@@ -223,12 +224,12 @@ export default function CustomersPage() {
                         </td>
 
                         <td className="px-6 py-4">
-                          <a
+                          <Link
                             href={`/customers/${customer.id}`}
                             className="font-medium text-slate-900 hover:underline"
                           >
                             View
-                          </a>
+                          </Link>
                         </td>
                       </tr>
                     ))}

@@ -8,6 +8,7 @@ import type { Customer } from "@/types/customer";
 import LoadingState from "@/components/ui/LoadingState";
 import ErrorState from "@/components/ui/ErrorState";
 import Badge from "@/components/ui/Badge";
+import Card, { CardContent, CardHeader } from "@/components/ui/Card";
 
 type CustomerPageProps = {
   params: Promise<{
@@ -92,71 +93,86 @@ export default function CustomerPage({ params }: CustomerPageProps) {
 
       <section className="p-8">
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          <ProfileCard
-            title="Lifecycle Stage"
-            value={customer.lifecycle_stage}
-          />
+          <Card>
+            <CardContent>
+              <p className="text-sm font-medium text-slate-500">
+                Lifecycle Stage
+              </p>
 
-          <ProfileCard title="Customer ID" value={customer.id} />
+              <p className="mt-3 text-lg font-semibold text-slate-900">
+                {customer.lifecycle_stage}
+              </p>
+            </CardContent>
+          </Card>
 
-          <ProfileCard title="Email" value={customer.email} />
+          <Card>
+            <CardContent>
+              <p className="text-sm font-medium text-slate-500">Customer ID</p>
 
-          <ProfileCard
-            title="Customer Since"
-            value={new Date(customer.created_at).toLocaleDateString()}
-          />
+              <p className="mt-3 break-all text-lg font-semibold text-slate-900">
+                {customer.id}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent>
+              <p className="text-sm font-medium text-slate-500">Email</p>
+
+              <p className="mt-3 break-all text-lg font-semibold text-slate-900">
+                {customer.email}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent>
+              <p className="text-sm font-medium text-slate-500">
+                Customer Since
+              </p>
+
+              <p className="mt-3 text-lg font-semibold text-slate-900">
+                {new Date(customer.created_at).toLocaleDateString()}
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Navigation */}
 
-        <div className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-6 py-4">
+        <Card className="mt-8">
+          <CardHeader>
             <h2 className="font-semibold text-slate-900">Customer Insights</h2>
 
             <p className="mt-1 text-sm text-slate-500">
               Explore customer activity, value, and intelligence.
             </p>
-          </div>
+          </CardHeader>
 
-          <div className="grid gap-4 p-6 md:grid-cols-3">
-            <InsightLink
-              title="Customer 360"
-              description="Complete customer overview"
-              href={`/customers/${customer.id}/360`}
-            />
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3">
+              <InsightLink
+                title="Customer 360"
+                description="Complete customer overview"
+                href={`/customers/${customer.id}/360`}
+              />
 
-            <InsightLink
-              title="Intelligence"
-              description="Prediction and next best action"
-              href={`/customers/${customer.id}/intelligence`}
-            />
+              <InsightLink
+                title="Intelligence"
+                description="Prediction and next best action"
+                href={`/customers/${customer.id}/intelligence`}
+              />
 
-            <InsightLink
-              title="Transactions"
-              description="Customer transaction history"
-              href={`/customers/${customer.id}/transactions`}
-            />
-          </div>
-        </div>
+              <InsightLink
+                title="Transactions"
+                description="Customer transaction history"
+                href={`/customers/${customer.id}/transactions`}
+              />
+            </div>
+          </CardContent>
+        </Card>
       </section>
     </main>
-  );
-}
-
-type ProfileCardProps = {
-  title: string;
-  value: string;
-};
-
-function ProfileCard({ title, value }: ProfileCardProps) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <p className="text-sm font-medium text-slate-500">{title}</p>
-
-      <p className="mt-3 break-all text-lg font-semibold text-slate-900">
-        {value}
-      </p>
-    </div>
   );
 }
 
@@ -168,7 +184,7 @@ type InsightLinkProps = {
 
 function InsightLink({ title, description, href }: InsightLinkProps) {
   return (
-    <a
+    <Link
       href={href}
       className="rounded-lg border border-slate-200 p-5 transition hover:border-slate-400 hover:bg-slate-50"
     >
@@ -177,6 +193,6 @@ function InsightLink({ title, description, href }: InsightLinkProps) {
       <p className="mt-1 text-sm text-slate-500">{description}</p>
 
       <p className="mt-4 text-sm font-medium text-slate-900">Open →</p>
-    </a>
+    </Link>
   );
 }
