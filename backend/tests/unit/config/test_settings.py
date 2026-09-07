@@ -1,5 +1,6 @@
-from app.config.settings import Settings
+import pytest
 
+from app.config.settings import Settings
 
 def test_default_settings() -> None:
     settings = Settings()
@@ -36,3 +37,27 @@ def test_settings_can_be_loaded_from_environment(
     assert settings.background_max_retries == 5
     assert settings.background_retry_delay == 0.5
     assert settings.background_shutdown_timeout == 60.0
+
+def test_settings_create_background_worker_options() -> None:
+    settings = Settings(
+        background_max_queue_size=5000,
+        background_max_retries=5,
+        background_retry_delay=0.5,
+        background_shutdown_timeout=60.0,
+    )
+
+    options = settings.create_background_worker_options()
+
+    assert options.max_queue_size == 5000
+    assert options.max_retries == 5
+    assert options.retry_delay == 0.5
+    assert options.shutdown_timeout == 60.0
+
+
+def test_invalid_settings_are_rejected_when_creating_worker_options() -> None:
+    settings = Settings(
+        background_max_queue_size=0,
+    )
+
+    with pytest.raises(ValueError):
+        settings.create_background_worker_options()    
