@@ -21,6 +21,12 @@ class BackgroundJobRequest:
     job: BackgroundJob
     payload: dict[str, Any]
 
+@dataclass(frozen=True)
+class BackgroundWorkerMetrics:
+    jobs_started: int
+    jobs_completed: int
+    jobs_failed: int
+    jobs_retried: int
 
 class BackgroundWorker:
     def __init__(
@@ -28,7 +34,7 @@ class BackgroundWorker:
         max_queue_size: int = 1000,
         max_retries: int = 3,
         retry_delay: float = 0.1,
-        shutdown_timeout: float = 30.0,
+        shutdown_timeout: float = 30.0,        
     ):        
         self._max_queue_size = max_queue_size
         self._max_retries = max_retries
@@ -37,6 +43,10 @@ class BackgroundWorker:
         self._queue: asyncio.Queue[BackgroundJobRequest] | None = None
         self._task: asyncio.Task[None] | None = None
         self._state = BackgroundWorkerState.STOPPED
+        self._jobs_started = 0
+        self._jobs_completed = 0
+        self._jobs_failed = 0
+        self._jobs_retried = 0        
 
     async def start(self) -> None:
         if self._state == BackgroundWorkerState.RUNNING:
@@ -119,11 +129,16 @@ class BackgroundWorker:
             request = await self._queue.get()
 
             try:
+                self._jobs_started += 1
+
                 attempt = 0
 
                 while True:
                     try:
                         await request.job.execute(request.payload)
+
+                        self._jobs_completed += 1
+
                         break
 
                     except asyncio.CancelledError:
@@ -133,13 +148,20 @@ class BackgroundWorker:
                         attempt += 1
 
                         if attempt > self._max_retries:
+                            self._jobs_failed += 1
+
                             logger.exception(
                                 "Background job failed after %s retries.",
                                 self._max_retries,
                             )
+
                             break
 
-                        delay = self._retry_delay * (2 ** (attempt - 1))
+                        self._jobs_retried += 1
+
+                        delay = self._retry_delay * (
+                            2 ** (attempt - 1)
+                        )
 
                         logger.exception(
                             "Background job failed. Retrying "
@@ -159,3 +181,23 @@ class BackgroundWorker:
                 and self._queue.empty()
             ):
                 break
+
+    @property
+    def metrics(self) -> BackgroundWorkerMetrics:
+        return BackgroundWorkerMetrics(
+            jobs_started=self._jobs_started,
+            jobs_completed=self._jobs_completed,
+            jobs_failed=self._jobs_failed,
+            jobs_retried=self._jobs_retried,
+        )
+
+    @property
+    def queue_size(self) -> int:
+        if self._queue is None:
+            return 0
+
+        return self._queue.qsize()    
+
+    @property
+    def state(self) -> BackgroundWorkerState:
+        return self._state    
