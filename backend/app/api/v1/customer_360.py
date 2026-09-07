@@ -8,7 +8,7 @@ from app.infrastructure.database.unit_of_work import PostgresUnitOfWork
 from app.application.customers.customer_360_service import (
     Customer360Service,
 )
-from app.api.v1.schemas.customer_360 import (
+from app.schemas.customer_360 import (
     Customer360Response,
 )
 

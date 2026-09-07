@@ -15,6 +15,24 @@ from app.schemas.customers import (
     CustomerListResponse,
     CustomerResponse,
 )
+from app.application.recommendations.customer_decision_engine import (
+    CustomerDecisionEngine,
+)
+from app.application.recommendations.next_best_action_service import (
+    NextBestActionService,
+)
+from app.application.scoring.customer_feature_extractor import (
+    CustomerFeatureExtractor,
+)
+from app.application.scoring.customer_intelligence_service import (
+    CustomerIntelligenceService,
+)
+from app.application.scoring.deterministic_customer_predictor import (
+    DeterministicCustomerPredictor,
+)
+from app.schemas.customer_intelligence import (
+    CustomerIntelligenceResponse,
+)
 
 
 router = APIRouter(
@@ -33,6 +51,19 @@ def get_customer_service(
         uow=uow,
     )
 
+def get_customer_intelligence_service(
+    session: AsyncSession = Depends(get_db_session),
+) -> CustomerIntelligenceService:
+
+    uow = PostgresUnitOfWork(session)
+
+    return CustomerIntelligenceService(
+        uow=uow,
+        feature_extractor=CustomerFeatureExtractor(),
+        predictor=DeterministicCustomerPredictor(),
+        decision_engine=CustomerDecisionEngine(),
+        action_service=NextBestActionService(),
+    )
 
 @router.post(
     "",
@@ -112,4 +143,35 @@ async def get_customers(
         page=page,
         page_size=page_size,
         total=total,
+    )
+
+@router.get(
+    "/{customer_id}/intelligence",
+    response_model=CustomerIntelligenceResponse,
+)
+async def get_customer_intelligence(
+    customer_id: UUID,
+    service: CustomerIntelligenceService = Depends(
+        get_customer_intelligence_service
+    ),
+):
+    result = await service.analyze(customer_id)
+
+    return CustomerIntelligenceResponse(
+        features={
+            "transaction_count": result.features.transaction_count,
+            "total_transaction_value": result.features.total_transaction_value,
+            "average_transaction_value": result.features.average_transaction_value,
+            "days_since_last_transaction": (
+                result.features.days_since_last_transaction
+            ),
+        },
+        prediction={
+            "churn_probability": result.prediction.churn_probability,
+        },
+        action={
+            "action_type": result.action.action_type,
+            "priority": result.action.priority,
+            "reason": result.action.reason,
+        },
     )

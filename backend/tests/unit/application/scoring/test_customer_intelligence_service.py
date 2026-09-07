@@ -18,55 +18,70 @@ from app.application.scoring.customer_intelligence_service import (
     CustomerIntelligenceService,
 )
 from app.application.scoring.customer_predictor import CustomerPredictor
+from app.domain.recommendations.customer_decision import (
+    CustomerDecision,
+    CustomerDecisionType,
+)
+from app.domain.recommendations.next_best_action import (
+    NextBestAction,
+    NextBestActionType,
+)
 from app.domain.scoring.customer_features import CustomerFeatures
 from app.domain.scoring.customer_prediction import CustomerPrediction
 
 
 @pytest.mark.asyncio
 async def test_customer_intelligence_service_orchestrates_pipeline() -> None:
-    customer_id = UUID(
-        "11111111-1111-1111-1111-111111111111"
-    )
+    customer_id = UUID("11111111-1111-1111-1111-111111111111")
 
-    transaction_repository = Mock()
-    transaction_repository.get_all_by_customer_id = AsyncMock(
-        return_value=[]
-    )
+    transactions = [
+        Mock()
+    ]
 
-    uow = Mock(spec=UnitOfWork)
-    uow.transactions = transaction_repository
-
-    feature_extractor = Mock(
-        spec=CustomerFeatureExtractor
-    )
-    predictor = Mock(
-        spec=CustomerPredictor
-    )
-    decision_engine = Mock(
-        spec=CustomerDecisionEngine
-    )
-    action_service = Mock(
-        spec=NextBestActionService
-    )
-
-    features = CustomerFeatures(
-        transaction_count=5,
-        total_transaction_value=Decimal("500"),
+    expected_features = CustomerFeatures(
+        transaction_count=1,
+        total_transaction_value=Decimal("100"),
         average_transaction_value=Decimal("100"),
         days_since_last_transaction=10,
     )
 
-    prediction = CustomerPrediction(
-        churn_probability=Decimal("0.10"),
+    expected_prediction = CustomerPrediction(
+        churn_probability=Decimal("0.20"),
     )
 
-    decision = Mock()
-    action = Mock()
+    expected_action = NextBestAction(
+        action_type=NextBestActionType.GROWTH_OFFER,
+        priority=3,
+        reason="Customer has low churn risk and may be suitable for growth.",
+    )
 
-    feature_extractor.extract.return_value = features
-    predictor.predict.return_value = prediction
+    uow = Mock(spec=UnitOfWork)
+
+    uow.customers = Mock()
+    uow.customers.get_by_id = AsyncMock(
+        return_value=Mock()
+    )
+
+    uow.transactions = Mock()
+    uow.transactions.get_all_by_customer_id = AsyncMock(
+        return_value=transactions
+    )
+
+    feature_extractor = Mock(spec=CustomerFeatureExtractor)
+    feature_extractor.extract.return_value = expected_features
+
+    predictor = Mock(spec=CustomerPredictor)
+    predictor.predict.return_value = expected_prediction
+
+    decision_engine = Mock(spec=CustomerDecisionEngine)
+    decision = CustomerDecision(
+        decision_type=CustomerDecisionType.GROWTH,
+        priority=3,
+    )
     decision_engine.decide.return_value = decision
-    action_service.determine.return_value = action
+
+    action_service = Mock(spec=NextBestActionService)
+    action_service.determine.return_value = expected_action
 
     service = CustomerIntelligenceService(
         uow=uow,
@@ -78,15 +93,30 @@ async def test_customer_intelligence_service_orchestrates_pipeline() -> None:
 
     result = await service.analyze(customer_id)
 
-    assert result.features == features
-    assert result.prediction == prediction
-    assert result.action == action
-
-    transaction_repository.get_all_by_customer_id.assert_awaited_once_with(
+    uow.customers.get_by_id.assert_awaited_once_with(
         customer_id
     )
 
-    feature_extractor.extract.assert_called_once_with([])
-    predictor.predict.assert_called_once_with(features)
-    decision_engine.decide.assert_called_once_with(prediction)
-    action_service.determine.assert_called_once_with(decision)
+    uow.transactions.get_all_by_customer_id.assert_awaited_once_with(
+        customer_id
+    )
+
+    feature_extractor.extract.assert_called_once_with(
+        transactions
+    )
+
+    predictor.predict.assert_called_once_with(
+        expected_features
+    )
+
+    decision_engine.decide.assert_called_once_with(
+        expected_prediction
+    )
+
+    action_service.determine.assert_called_once_with(
+        decision
+    )
+
+    assert result.features == expected_features
+    assert result.prediction == expected_prediction
+    assert result.action == expected_action

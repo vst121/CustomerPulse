@@ -48,6 +48,13 @@ class CustomerIntelligenceService:
         customer_id: UUID,
     ) -> CustomerIntelligenceResult:
 
+        customer = await self._uow.customers.get_by_id(
+            customer_id
+        )
+
+        if customer is None:
+            raise ValueError("Customer not found.")
+
         transactions = (
             await self._uow.transactions.get_all_by_customer_id(
                 customer_id
@@ -74,4 +81,4 @@ class CustomerIntelligenceService:
             features=features,
             prediction=prediction,
             action=action,
-        )   
+        )
