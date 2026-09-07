@@ -7,6 +7,7 @@ import type { Customer } from "@/types/customer";
 
 import LoadingState from "@/components/ui/LoadingState";
 import ErrorState from "@/components/ui/ErrorState";
+import Badge from "@/components/ui/Badge";
 
 type CustomerPageProps = {
   params: Promise<{
@@ -80,9 +81,9 @@ export default function CustomerPage({ params }: CustomerPageProps) {
               <p className="mt-1 text-sm text-slate-500">{customer.email}</p>
             </div>
 
-            <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+            <Badge className="px-4 py-2 text-sm">
               {customer.lifecycle_stage}
-            </span>
+            </Badge>
           </div>
         </div>
       </header>

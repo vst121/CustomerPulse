@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { getCustomer360 } from "@/services/api/customers";
 import type { Customer360 } from "@/types/customer360";
+import Badge from "@/components/ui/Badge";
 
 type Customer360PageProps = {
   params: Promise<{
@@ -82,9 +83,9 @@ export default function Customer360Page({ params }: Customer360PageProps) {
               <p className="mt-1 text-sm text-slate-500">Customer 360</p>
             </div>
 
-            <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+            <Badge className="px-4 py-2 text-sm">
               {customer.lifecycle_stage}
-            </span>
+            </Badge>
           </div>
         </div>
       </header>

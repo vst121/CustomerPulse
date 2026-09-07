@@ -5,6 +5,7 @@ import { getCustomers } from "@/services/api/customers";
 import type { Customer, LifecycleStage } from "@/types/customer";
 
 import LoadingState from "@/components/ui/LoadingState";
+import Badge from "@/components/ui/Badge";
 
 const PAGE_SIZE = 10;
 
@@ -212,9 +213,9 @@ export default function CustomersPage() {
                         </td>
 
                         <td className="px-6 py-4">
-                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                          <Badge className="px-4 py-2 text-sm">
                             {customer.lifecycle_stage}
-                          </span>
+                          </Badge>
                         </td>
 
                         <td className="px-6 py-4 text-slate-600">
