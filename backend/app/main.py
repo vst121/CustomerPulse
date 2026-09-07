@@ -4,6 +4,8 @@ from fastapi import FastAPI
 
 from app.api.v1.router import router as api_v1_router
 from app.application.common.application_runtime import background_worker
+from fastapi.middleware.cors import CORSMiddleware
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,6 +19,14 @@ app = FastAPI(
     description="Customer Lifecycle & Value Management Platform",
     version="0.1.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(
