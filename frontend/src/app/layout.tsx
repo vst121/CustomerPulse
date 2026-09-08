@@ -4,7 +4,7 @@ import "./globals.css";
 import Sidebar from "@/components/layout/Sidebar";
 
 export const metadata: Metadata = {
-  title: "CustomerPulse",
+  title: "Customer Pulse",
   description: "AI-powered Customer Lifecycle & Value Management Platform",
 };
 

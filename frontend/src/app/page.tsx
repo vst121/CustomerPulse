@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import MetricCard from "@/components/ui/MetricCard";
 import { getCustomers } from "@/services/api/customers";
+import PageHeader from "@/components/layout/PageHeader";
 
 const lifecycleStages = [
   "Acquisition",
@@ -37,17 +38,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
-      <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
-        <div>
-          <h2 className="text-lg font-semibold">Dashboard</h2>
-
-          <p className="text-sm text-slate-500">
-            Customer lifecycle and value management
-          </p>
-        </div>
-        <div className="text-sm text-slate-600">Hi User!</div>
-      </header>
-
+      <PageHeader title="Dashboard" description="Customers Dashboard " />
       <div className="p-8">
         <div className="mb-8">
           <p className="text-sm font-medium text-slate-500">
@@ -59,8 +50,8 @@ export default function HomePage() {
           </h3>
 
           <p className="mt-2 max-w-2xl text-slate-600">
-            Understand your customers, their lifecycle, and the actions that
-            can improve customer value.
+            Understand your customers, their lifecycle, and the actions that can
+            improve customer value.
           </p>
         </div>
 

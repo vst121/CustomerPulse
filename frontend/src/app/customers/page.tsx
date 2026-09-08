@@ -7,6 +7,7 @@ import type { Customer, LifecycleStage } from "@/types/customer";
 
 import LoadingState from "@/components/ui/LoadingState";
 import Badge from "@/components/ui/Badge";
+import PageHeader from "@/components/layout/PageHeader";
 
 const PAGE_SIZE = 10;
 
@@ -88,17 +89,10 @@ export default function CustomersPage() {
 
   return (
     <main className="min-h-screen">
-      <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
-        <div>
-          <h2 className="text-lg font-semibold">Customers</h2>
-
-          <p className="text-sm text-slate-500">
-            Manage customers and understand their lifecycle
-          </p>
-        </div>
-        <div className="text-sm text-slate-600">Hi User!</div>
-      </header>
-
+      <PageHeader
+        title="Customers"
+        description="Customer lifecycle and value management"
+      />
       <section className="p-8">
         <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
           {/* Header */}
