@@ -13,7 +13,7 @@ export default function Sidebar() {
     <aside className="w-64 shrink-0 border-r border-slate-200 bg-white">
       <div className="flex h-16 items-center border-b border-slate-200 px-6">
         <h1 className="text-xl font-bold tracking-tight text-slate-900">
-          CustomerPulse
+          Customer Pulse
         </h1>
       </div>
 
