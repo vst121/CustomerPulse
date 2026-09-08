@@ -88,36 +88,38 @@ export default function NewTransactionPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
         <div className="px-8 py-6">
           <div className="flex items-center gap-3">
             <Link
               href={`/customers/${customerId}`}
-              className="text-sm font-medium text-slate-500 hover:text-slate-900"
+              className="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
             >
               Customer
             </Link>
 
-            <span className="text-slate-300">/</span>
+            <span className="text-slate-300 dark:text-slate-700">/</span>
 
             <Link
               href={`/customers/${customerId}/transactions`}
-              className="text-sm font-medium text-slate-500 hover:text-slate-900"
+              className="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
             >
               Transactions
             </Link>
 
-            <span className="text-slate-300">/</span>
+            <span className="text-slate-300 dark:text-slate-700">/</span>
 
-            <span className="text-sm text-slate-500">Add Transaction</span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">
+              Add Transaction
+            </span>
           </div>
 
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
             Add Transaction
           </h1>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Create a new transaction for this customer.
           </p>
         </div>
@@ -127,11 +129,11 @@ export default function NewTransactionPage() {
         <div className="mx-auto max-w-2xl">
           <Card>
             <CardHeader>
-              <h2 className="font-semibold text-slate-900">
+              <h2 className="font-semibold text-slate-900 dark:text-white">
                 Transaction Information
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 Enter the transaction details.
               </p>
             </CardHeader>
@@ -151,7 +153,7 @@ export default function NewTransactionPage() {
                   <div>
                     <label
                       htmlFor="amount"
-                      className="block text-sm font-medium text-slate-700"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                     >
                       Amount
                     </label>
@@ -164,14 +166,14 @@ export default function NewTransactionPage() {
                       value={amount}
                       onChange={(event) => setAmount(event.target.value)}
                       required
-                      className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700"
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor="currency"
-                      className="block text-sm font-medium text-slate-700"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                     >
                       Currency
                     </label>
@@ -184,7 +186,7 @@ export default function NewTransactionPage() {
                       required
                       minLength={3}
                       maxLength={3}
-                      className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm uppercase outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm uppercase text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700"
                     />
                   </div>
                 </div>
@@ -193,7 +195,7 @@ export default function NewTransactionPage() {
                   <div>
                     <label
                       htmlFor="category"
-                      className="block text-sm font-medium text-slate-700"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                     >
                       Category
                     </label>
@@ -204,7 +206,7 @@ export default function NewTransactionPage() {
                       onChange={(event) =>
                         setCategory(event.target.value as TransactionCategory)
                       }
-                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700"
                     >
                       {CATEGORIES.map((item) => (
                         <option key={item} value={item}>
@@ -217,7 +219,7 @@ export default function NewTransactionPage() {
                   <div>
                     <label
                       htmlFor="status"
-                      className="block text-sm font-medium text-slate-700"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                     >
                       Status
                     </label>
@@ -228,7 +230,7 @@ export default function NewTransactionPage() {
                       onChange={(event) =>
                         setStatus(event.target.value as TransactionStatus)
                       }
-                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                      className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700"
                     >
                       {STATUSES.map((item) => (
                         <option key={item} value={item}>
@@ -242,7 +244,7 @@ export default function NewTransactionPage() {
                 <div>
                   <label
                     htmlFor="timestamp"
-                    className="block text-sm font-medium text-slate-700"
+                    className="block text-sm font-medium text-slate-700 dark:text-slate-300"
                   >
                     Transaction Date & Time
                   </label>
@@ -253,14 +255,14 @@ export default function NewTransactionPage() {
                     value={timestamp}
                     onChange={(event) => setTimestamp(event.target.value)}
                     required
-                    className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                    className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700"
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-3 border-t border-slate-200 pt-6">
+                <div className="flex items-center justify-end gap-3 border-t border-slate-200 pt-6 dark:border-slate-800">
                   <Link
                     href={`/customers/${customerId}/transactions`}
-                    className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    className="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                   >
                     Cancel
                   </Link>
@@ -268,7 +270,7 @@ export default function NewTransactionPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
                   >
                     {loading ? "Creating..." : "Create Transaction"}
                   </button>

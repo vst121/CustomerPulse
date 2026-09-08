@@ -37,19 +37,19 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <PageHeader title="Dashboard" description="Customers Dashboard " />
       <div className="p-8">
         <div className="mb-8">
-          <p className="text-sm font-medium text-slate-500">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
             Customer Lifecycle & Value Management
           </p>
 
-          <h3 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
+          <h3 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             Customer Overview
           </h3>
 
-          <p className="mt-2 max-w-2xl text-slate-600">
+          <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-400">
             Understand your customers, their lifecycle, and the actions that can
             improve customer value.
           </p>
@@ -65,11 +65,11 @@ export default function HomePage() {
 
         <section>
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-slate-900">
+            <h4 className="text-lg font-semibold text-slate-900 dark:text-white">
               Customer Lifecycle
             </h4>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               CustomerPulse manages the customer journey from acquisition to
               win-back.
             </p>
@@ -79,13 +79,13 @@ export default function HomePage() {
             {lifecycleStages.map((stage, index) => (
               <div
                 key={stage}
-                className="rounded-xl border border-slate-200 bg-white p-5"
+                className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900"
               >
-                <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700">
+                <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                   {index + 1}
                 </div>
 
-                <h5 className="text-sm font-semibold text-slate-900">
+                <h5 className="text-sm font-semibold text-slate-900 dark:text-white">
                   {stage}
                 </h5>
 
@@ -98,37 +98,36 @@ export default function HomePage() {
         </section>
 
         <section className="mt-10">
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-            <h4 className="text-lg font-semibold text-slate-900">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900">
+            <h4 className="text-lg font-semibold text-slate-900 dark:text-white">
               Customer Intelligence
             </h4>
 
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
               CustomerPulse combines customer behavior, value, lifecycle
               signals, churn prediction, and next-best-action decisions to
               support customer-focused decisions.
             </p>
 
             <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
-              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200">
+              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
                 Customer Data
               </span>
 
               <span className="text-slate-400">→</span>
 
-              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200">
+              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
                 Prediction
               </span>
 
               <span className="text-slate-400">→</span>
 
-              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200">
+              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
                 Decision
               </span>
 
               <span className="text-slate-400">→</span>
-
-              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200">
+              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
                 Next Best Action
               </span>
             </div>

@@ -88,26 +88,30 @@ export default function CustomersPage() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <PageHeader
         title="Customers"
         description="Customer lifecycle and value management"
       />
       <section className="p-8">
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           {/* Header */}
 
-          <div className="border-b border-slate-200 px-6 py-4">
+          <div className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-slate-900">Customer List</h2>
+                <h2 className="font-semibold text-slate-900 dark:text-white">
+                  Customer List
+                </h2>
 
-                <p className="mt-1 text-sm text-slate-500">{total} customers</p>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  {total} customers
+                </p>
               </div>
 
               <Link
                 href="/customers/new"
-                className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
               >
                 Add Customer
               </Link>
@@ -131,7 +135,7 @@ export default function CustomersPage() {
                     event.target.value as LifecycleStage | "",
                   )
                 }
-                className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-slate-500 dark:focus:ring-slate-700"
               >
                 <option value="">All lifecycle stages</option>
 
@@ -166,25 +170,25 @@ export default function CustomersPage() {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="border-b border-slate-200 bg-slate-50">
+                  <thead className="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950">
                     <tr>
-                      <th className="px-6 py-3 font-medium text-slate-500">
+                      <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-400">
                         Customer
                       </th>
 
-                      <th className="px-6 py-3 font-medium text-slate-500">
+                      <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-400">
                         Email
                       </th>
 
-                      <th className="px-6 py-3 font-medium text-slate-500">
+                      <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-400">
                         Lifecycle
                       </th>
 
-                      <th className="px-6 py-3 font-medium text-slate-500">
+                      <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-400">
                         Created
                       </th>
 
-                      <th className="px-6 py-3 font-medium text-slate-500">
+                      <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-400">
                         Action
                       </th>
                     </tr>
@@ -194,15 +198,15 @@ export default function CustomersPage() {
                     {customers.map((customer) => (
                       <tr
                         key={customer.id}
-                        className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                        className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50"
                       >
                         <td className="px-6 py-4">
-                          <div className="font-medium text-slate-900">
+                          <div className="font-medium text-slate-900 dark:text-white">
                             {customer.first_name} {customer.last_name}
                           </div>
                         </td>
 
-                        <td className="px-6 py-4 text-slate-600">
+                        <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
                           {customer.email}
                         </td>
 
@@ -212,14 +216,14 @@ export default function CustomersPage() {
                           </Badge>
                         </td>
 
-                        <td className="px-6 py-4 text-slate-600">
+                        <td className="px-6 py-4 text-slate-600 dark:text-slate-400">
                           {new Date(customer.created_at).toLocaleDateString()}
                         </td>
 
                         <td className="px-6 py-4">
                           <Link
                             href={`/customers/${customer.id}`}
-                            className="font-medium text-slate-900 hover:underline"
+                            className="font-medium text-slate-900 hover:underline dark:text-slate-100"
                           >
                             View
                           </Link>
@@ -243,8 +247,8 @@ export default function CustomersPage() {
 
               {/* Pagination */}
 
-              <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4">
-                <p className="text-sm text-slate-500">
+              <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 px-6 py-4">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                   Page {page} of {totalPages}
                 </p>
 
@@ -253,7 +257,7 @@ export default function CustomersPage() {
                     type="button"
                     disabled={page <= 1}
                     onClick={() => setPage((current) => current - 1)}
-                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                   >
                     Previous
                   </button>
@@ -262,7 +266,7 @@ export default function CustomersPage() {
                     type="button"
                     disabled={page >= totalPages}
                     onClick={() => setPage((current) => current + 1)}
-                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                   >
                     Next
                   </button>

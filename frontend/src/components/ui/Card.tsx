@@ -11,7 +11,7 @@ export default function Card({
 }: CardProps) {
   return (
     <div
-      className={`rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}
+      className={`rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 ${className}`}
     >
       {children}
     </div>
@@ -24,7 +24,7 @@ type CardHeaderProps = {
 
 export function CardHeader({ children }: CardHeaderProps) {
   return (
-    <div className="border-b border-slate-200 px-6 py-4">
+    <div className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
       {children}
     </div>
   );

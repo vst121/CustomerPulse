@@ -20,9 +20,8 @@ type IntelligencePageProps = {
 
 export default function IntelligencePage({ params }: IntelligencePageProps) {
   const [customer, setCustomer] = useState<Customer | null>(null);
-  const [intelligence, setIntelligence] = useState<CustomerIntelligence | null>(
-    null,
-  );
+  const [intelligence, setIntelligence] =
+    useState<CustomerIntelligence | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,20 +70,19 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-50 p-8">
-        {" "}
-        <LoadingState message="Loading customer intelligence..." />{" "}
+      <main className="min-h-screen bg-slate-50 p-8 dark:bg-slate-950">
+        <LoadingState message="Loading customer intelligence..." />
       </main>
     );
   }
 
   if (error || !customer || !intelligence) {
     return (
-      <main className="min-h-screen bg-slate-50 p-8">
+      <main className="min-h-screen bg-slate-50 p-8 dark:bg-slate-950">
         <ErrorState
           title="Unable to load customer intelligence"
           message={error ?? "Customer intelligence is unavailable."}
-        />{" "}
+        />
       </main>
     );
   }
@@ -112,24 +110,26 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
         : "The customer currently shows relatively stable behavior.";
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Header */}
 
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
         <div className="px-8 py-6">
           <Link
             href={`/customers/${customer.id}`}
-            className="text-sm font-medium text-slate-500 hover:text-slate-900"
+            className="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
           >
             ← Customer Profile
           </Link>
 
           <div className="mt-4">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               {customer.first_name} {customer.last_name}
             </h1>
 
-            <p className="mt-1 text-sm text-slate-500">Customer Intelligence</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Customer Intelligence
+            </p>
           </div>
         </div>
       </header>
@@ -137,11 +137,13 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
       <section className="p-8">
         {/* Customer Health */}
 
-        <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="font-semibold text-slate-900">Customer Health</h2>
+        <section className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+            <h2 className="font-semibold text-slate-900 dark:text-white">
+              Customer Health
+            </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               High-level indicators of the customer current state.
             </p>
           </div>
@@ -163,11 +165,13 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
 
         {/* Behavioral Signals */}
 
-        <section className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="font-semibold text-slate-900">Behavioral Signals</h2>
+        <section className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+            <h2 className="font-semibold text-slate-900 dark:text-white">
+              Behavioral Signals
+            </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Customer behavior used as input to the prediction.
             </p>
           </div>
@@ -195,11 +199,13 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
 
         {/* Risk Assessment */}
 
-        <section className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="font-semibold text-slate-900">Risk Assessment</h2>
+        <section className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+            <h2 className="font-semibold text-slate-900 dark:text-white">
+              Risk Assessment
+            </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Interpretation of the predicted churn probability.
             </p>
           </div>
@@ -207,32 +213,36 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
           <div className="p-6">
             <div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-center">
               <div>
-                <p className="text-sm font-medium text-slate-500">Assessment</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  Assessment
+                </p>
 
-                <p className="mt-2 text-3xl font-bold text-slate-900">
+                <p className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
                   {riskLevel}
                 </p>
               </div>
 
               <div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Churn probability</span>
+                  <span className="text-slate-500 dark:text-slate-400">
+                    Churn probability
+                  </span>
 
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">
                     {normalizedChurnProbability.toFixed(0)}%
                   </span>
                 </div>
 
-                <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                   <div
-                    className="h-full rounded-full bg-slate-900 transition-all duration-500"
+                    className="h-full rounded-full bg-slate-900 transition-all duration-500 dark:bg-slate-200"
                     style={{
                       width: `${normalizedChurnProbability}%`,
                     }}
                   />
                 </div>
 
-                <p className="mt-4 text-sm leading-6 text-slate-600">
+                <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-300">
                   {riskExplanation}
                 </p>
               </div>
@@ -242,13 +252,13 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
 
         {/* Decision & Next Best Action */}
 
-        <section className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="font-semibold text-slate-900">
+        <section className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+            <h2 className="font-semibold text-slate-900 dark:text-white">
               Decision & Next Best Action
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               The recommended intervention based on the prediction.
             </p>
           </div>
@@ -264,10 +274,12 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
               value={String(intelligence.action.priority)}
             />
 
-            <div className="rounded-lg border border-slate-200 p-5">
-              <p className="text-sm font-medium text-slate-500">Reason</p>
+            <div className="rounded-lg border border-slate-200 p-5 dark:border-slate-800">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                Reason
+              </p>
 
-              <p className="mt-3 text-sm leading-6 text-slate-700">
+              <p className="mt-3 text-sm leading-6 text-slate-700 dark:text-slate-300">
                 {intelligence.action.reason}
               </p>
             </div>
@@ -276,10 +288,12 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
 
         {/* Intelligence Flow */}
 
-        <section className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="font-semibold text-slate-900">Intelligence Flow</h2>
+        <section className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="font-semibold text-slate-900 dark:text-white">
+            Intelligence Flow
+          </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             How customer behavior becomes an actionable recommendation.
           </p>
 
@@ -312,11 +326,18 @@ type MetricCardProps = {
 
 function MetricCard({ title, value, description }: MetricCardProps) {
   return (
-    <div className="rounded-lg border border-slate-200 p-5">
-      {" "}
-      <p className="text-sm font-medium text-slate-500">{title} </p>
-      <p className="mt-3 text-2xl font-bold text-slate-900">{value}</p>
-      <p className="mt-2 text-xs text-slate-500">{description}</p>
+    <div className="rounded-lg border border-slate-200 p-5 dark:border-slate-800">
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+        {title}
+      </p>
+
+      <p className="mt-3 text-2xl font-bold text-slate-900 dark:text-white">
+        {value}
+      </p>
+
+      <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+        {description}
+      </p>
     </div>
   );
 }
@@ -329,11 +350,18 @@ type SignalCardProps = {
 
 function SignalCard({ title, value, description }: SignalCardProps) {
   return (
-    <div className="rounded-lg border border-slate-200 p-5">
-      {" "}
-      <p className="text-sm font-medium text-slate-500">{title} </p>
-      <p className="mt-3 text-2xl font-bold text-slate-900">{value}</p>
-      <p className="mt-2 text-xs text-slate-500">{description}</p>
+    <div className="rounded-lg border border-slate-200 p-5 dark:border-slate-800">
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+        {title}
+      </p>
+
+      <p className="mt-3 text-2xl font-bold text-slate-900 dark:text-white">
+        {value}
+      </p>
+
+      <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+        {description}
+      </p>
     </div>
   );
 }
@@ -345,10 +373,12 @@ type DecisionCardProps = {
 
 function DecisionCard({ title, value }: DecisionCardProps) {
   return (
-    <div className="rounded-lg border border-slate-200 p-5">
-      {" "}
-      <p className="text-sm font-medium text-slate-500">{title} </p>
-      <p className="mt-3 break-words text-lg font-bold text-slate-900">
+    <div className="rounded-lg border border-slate-200 p-5 dark:border-slate-800">
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+        {title}
+      </p>
+
+      <p className="mt-3 break-words text-lg font-bold text-slate-900 dark:text-white">
         {value}
       </p>
     </div>
@@ -357,13 +387,18 @@ function DecisionCard({ title, value }: DecisionCardProps) {
 
 function FlowStep({ label }: { label: string }) {
   return (
-    <div className="flex-1 rounded-lg border border-slate-200 bg-slate-50 px-4 py-4 text-center">
-      {" "}
-      <span className="text-sm font-medium text-slate-700">{label} </span>{" "}
+    <div className="flex-1 rounded-lg border border-slate-200 bg-slate-50 px-4 py-4 text-center dark:border-slate-800 dark:bg-slate-950">
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+        {label}
+      </span>
     </div>
   );
 }
 
 function FlowArrow() {
-  return <div className="hidden text-xl text-slate-400 md:block">→ </div>;
+  return (
+    <div className="hidden text-xl text-slate-400 dark:text-slate-600 md:block">
+      →
+    </div>
+  );
 }

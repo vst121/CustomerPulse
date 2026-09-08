@@ -41,16 +41,16 @@ function formatDate(timestamp: string): string {
 function getStatusClassName(status: TransactionStatus): string {
   switch (status) {
     case "COMPLETED":
-      return "bg-green-100 text-green-700";
+      return "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300";
 
     case "PENDING":
-      return "bg-yellow-100 text-yellow-700";
+      return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300";
 
     case "FAILED":
-      return "bg-red-100 text-red-700";
+      return "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300";
 
     case "REVERSED":
-      return "bg-slate-200 text-slate-700";
+      return "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300";
   }
 }
 
@@ -123,12 +123,16 @@ export default function CustomerTransactionsPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   if (loading) {
-    return <LoadingState message="Loading transactions..." />;
+    return (
+      <main className="min-h-screen bg-slate-50 p-8 dark:bg-slate-950">
+        <LoadingState message="Loading transactions..." />
+      </main>
+    );
   }
 
   if (error) {
     return (
-      <main className="min-h-screen bg-slate-50 p-8">
+      <main className="min-h-screen bg-slate-50 p-8 dark:bg-slate-950">
         <ErrorState title="Unable to load transactions" message={error} />
       </main>
     );
@@ -136,7 +140,7 @@ export default function CustomerTransactionsPage({
 
   if (!customer) {
     return (
-      <main className="min-h-screen bg-slate-50 p-8">
+      <main className="min-h-screen bg-slate-50 p-8 dark:bg-slate-950">
         <ErrorState
           title="Customer not found"
           message="The requested customer could not be found."
@@ -146,38 +150,40 @@ export default function CustomerTransactionsPage({
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
+    <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
         <div className="px-8 py-6">
           <div className="flex items-center gap-3">
             <Link
               href="/customers"
-              className="text-sm font-medium text-slate-500 hover:text-slate-900"
+              className="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
             >
               Customers
             </Link>
 
-            <span className="text-slate-300">/</span>
+            <span className="text-slate-300 dark:text-slate-700">/</span>
 
             <Link
               href={`/customers/${customer.id}`}
-              className="text-sm font-medium text-slate-500 hover:text-slate-900"
+              className="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
             >
               {customer.first_name} {customer.last_name}
             </Link>
 
-            <span className="text-slate-300">/</span>
+            <span className="text-slate-300 dark:text-slate-700">/</span>
 
-            <span className="text-sm text-slate-500">Transactions</span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">
+              Transactions
+            </span>
           </div>
 
           <div className="mt-4 flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 Transactions
               </h1>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 Transaction history for {customer.first_name}{" "}
                 {customer.last_name}.
               </p>
@@ -185,7 +191,7 @@ export default function CustomerTransactionsPage({
 
             <Link
               href={`/customers/${customer.id}/transactions/new`}
-              className="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
+              className="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
             >
               Add Transaction
             </Link>
@@ -199,11 +205,11 @@ export default function CustomerTransactionsPage({
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-semibold text-slate-900">
+                  <h2 className="font-semibold text-slate-900 dark:text-white">
                     Transaction History
                   </h2>
 
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                     {total} transaction
                     {total === 1 ? "" : "s"}
                   </p>
@@ -214,11 +220,11 @@ export default function CustomerTransactionsPage({
             <CardContent className="p-0">
               {transactions.length === 0 ? (
                 <div className="px-6 py-12 text-center">
-                  <p className="font-medium text-slate-900">
+                  <p className="font-medium text-slate-900 dark:text-white">
                     No transactions found
                   </p>
 
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                     This customer does not have any transactions yet.
                   </p>
                 </div>
@@ -226,47 +232,47 @@ export default function CustomerTransactionsPage({
                 <>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                      <thead className="border-b border-slate-200 bg-slate-50">
+                      <thead className="border-b border-slate-200 bg-slate-50 dark:border-slate-900 dark:bg-slate-700">
                         <tr>
-                          <th className="px-6 py-3 font-medium text-slate-500">
+                          <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-200">
                             Date
                           </th>
 
-                          <th className="px-6 py-3 font-medium text-slate-500">
+                          <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-200">
                             Category
                           </th>
 
-                          <th className="px-6 py-3 font-medium text-slate-500">
+                          <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-200">
                             Amount
                           </th>
 
-                          <th className="px-6 py-3 font-medium text-slate-500">
+                          <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-200">
                             Status
                           </th>
 
-                          <th className="px-6 py-3 font-medium text-slate-500">
+                          <th className="px-6 py-3 font-medium text-slate-500 dark:text-slate-200">
                             Transaction ID
                           </th>
                         </tr>
                       </thead>
 
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {transactions.map((transaction) => (
                           <tr
                             key={transaction.id}
-                            className="hover:bg-slate-50"
+                            className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
                           >
-                            <td className="whitespace-nowrap px-6 py-4 text-slate-700">
+                            <td className="whitespace-nowrap px-6 py-4 text-slate-700 dark:text-slate-300">
                               {formatDate(transaction.timestamp)}
                             </td>
 
                             <td className="px-6 py-4">
-                              <span className="font-medium text-slate-900">
+                              <span className="font-medium text-slate-900 dark:text-white">
                                 {getCategoryLabel(transaction.category)}
                               </span>
                             </td>
 
-                            <td className="whitespace-nowrap px-6 py-4 font-medium text-slate-900">
+                            <td className="whitespace-nowrap px-6 py-4 font-medium text-slate-900 dark:text-white">
                               {formatAmount(
                                 transaction.amount,
                                 transaction.currency,
@@ -283,7 +289,7 @@ export default function CustomerTransactionsPage({
                               </Badge>
                             </td>
 
-                            <td className="px-6 py-4 font-mono text-xs text-slate-500">
+                            <td className="px-6 py-4 font-mono text-xs text-slate-500 dark:text-slate-400">
                               {transaction.id}
                             </td>
                           </tr>
@@ -292,8 +298,8 @@ export default function CustomerTransactionsPage({
                     </table>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4">
-                    <p className="text-sm text-slate-500">
+                  <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4 dark:border-slate-800">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
                       Page {page} of {Math.max(totalPages, 1)}
                     </p>
 
@@ -304,7 +310,7 @@ export default function CustomerTransactionsPage({
                         onClick={() =>
                           setPage((current) => Math.max(current - 1, 1))
                         }
-                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                       >
                         Previous
                       </button>
@@ -317,7 +323,7 @@ export default function CustomerTransactionsPage({
                             Math.min(current + 1, totalPages),
                           )
                         }
-                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                       >
                         Next
                       </button>
