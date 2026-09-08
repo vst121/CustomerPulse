@@ -92,15 +92,15 @@ class TransactionService:
 
             return transaction
 
-
     async def get_transaction(
         self,
         transaction_id: UUID,
     ) -> Transaction | None:
 
-        return await self.transaction_repository.get_by_id(
-            transaction_id
-        )
+        async with self.uow:
+            return await self.uow.transactions.get_by_id(
+                transaction_id
+            )
 
     async def get_customer_transactions(
         self,
@@ -109,8 +109,9 @@ class TransactionService:
         page_size: int,
     ) -> tuple[list[Transaction], int]:
 
-        return await self.transaction_repository.get_by_customer_id(
-            customer_id=customer_id,
-            page=page,
-            page_size=page_size,
-        )
+        async with self.uow:
+            return await self.uow.transactions.get_by_customer_id(
+                customer_id=customer_id,
+                page=page,
+                page_size=page_size,
+            )

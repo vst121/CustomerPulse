@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.domain.transactions.entities import (
     TransactionCategory,
@@ -22,6 +22,8 @@ class CreateTransactionRequest(BaseModel):
 
 
 class TransactionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     customer_id: UUID
     amount: Decimal
@@ -29,7 +31,7 @@ class TransactionResponse(BaseModel):
     category: TransactionCategory
     status: TransactionStatus
     timestamp: datetime
-
+    
 
 class TransactionListResponse(BaseModel):
     items: list[TransactionResponse]

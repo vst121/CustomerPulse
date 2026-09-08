@@ -25,20 +25,6 @@ export default function HomePage() {
           >
             Customers
           </Link>
-
-          <Link
-            href="/transactions"
-            className="flex items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-          >
-            Transactions
-          </Link>
-
-          <Link
-            href="/recommendations"
-            className="flex items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-          >
-            Recommendations
-          </Link>
         </nav>
       </aside>
 
