@@ -56,3 +56,18 @@ export async function getCustomer360(
     `/api/v1/customers/${customerId}/360`,
   );
 }
+
+export type CreateCustomerRequest = {
+  first_name: string;
+  last_name: string;
+  email: string;
+};
+
+export async function createCustomer(
+  request: CreateCustomerRequest,
+): Promise<Customer> {
+  return apiClient<Customer>("/api/v1/customers", {
+    method: "POST",
+    body: JSON.stringify(request),
+  });
+}

@@ -112,12 +112,12 @@ export default function CustomersPage() {
                 <p className="mt-1 text-sm text-slate-500">{total} customers</p>
               </div>
 
-              <button
-                type="button"
+              <Link
+                href="/customers/new"
                 className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
               >
                 Add Customer
-              </button>
+              </Link>
             </div>
 
             {/* Filters */}
