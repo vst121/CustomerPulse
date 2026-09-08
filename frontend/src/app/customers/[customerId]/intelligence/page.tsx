@@ -89,8 +89,6 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
     );
   }
 
-  const customerScore = Number(customer.score?.score ?? 0);
-
   const churnProbability =
     Number(intelligence.prediction.churn_probability) * 100;
 
@@ -144,17 +142,11 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
             <h2 className="font-semibold text-slate-900">Customer Health</h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              High-level indicators of the customer's current state.
+              High-level indicators of the customer current state.
             </p>
           </div>
 
-          <div className="grid gap-6 p-6 md:grid-cols-3">
-            <MetricCard
-              title="Customer Score"
-              value={customerScore.toFixed(2)}
-              description="Current customer score"
-            />
-
+          <div className="grid gap-6 p-6 md:grid-cols-2">
             <MetricCard
               title="Churn Probability"
               value={`${normalizedChurnProbability.toFixed(0)}%`}

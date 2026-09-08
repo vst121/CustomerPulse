@@ -152,6 +152,12 @@ export default function CustomerPage({ params }: CustomerPageProps) {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-4">
               <InsightLink
+                title="Transactions"
+                description="Customer transaction history"
+                href={`/customers/${customer.id}/transactions`}
+              />
+
+              <InsightLink
                 title="Customer 360"
                 description="Complete customer overview"
                 href={`/customers/${customer.id}/360`}
@@ -163,11 +169,6 @@ export default function CustomerPage({ params }: CustomerPageProps) {
                 href={`/customers/${customer.id}/intelligence`}
               />
 
-              <InsightLink
-                title="Transactions"
-                description="Customer transaction history"
-                href={`/customers/${customer.id}/transactions`}
-              />
               <InsightLink
                 title="Recommendations"
                 description="Customer recommendations"

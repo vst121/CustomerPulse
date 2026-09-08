@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { Pie, PieChart, ResponsiveContainer, Sector, Tooltip } from "recharts";
 
 type CategorySpending = {
   category: string;
@@ -16,6 +10,15 @@ type CategorySpending = {
 type SpendingByCategoryChartProps = {
   data: CategorySpending[];
   currency?: string;
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  FOOD: "#16a34a",
+  SHOPPING: "#2563eb",
+  TRAVEL: "#9333ea",
+  ENTERTAINMENT: "#db2777",
+  UTILITIES: "#f59e0b",
+  HEALTH: "#dc2626",
 };
 
 export default function SpendingByCategoryChart({
@@ -43,15 +46,16 @@ export default function SpendingByCategoryChart({
             outerRadius={110}
             innerRadius={65}
             paddingAngle={2}
+            shape={(props) => (
+              <Sector
+                {...props}
+                fill={CATEGORY_COLORS[props.name as string] ?? "#64748b"}
+              />
+            )}
             label={({ category, percent }) =>
               `${category} ${(percent * 100).toFixed(0)}%`
             }
-          >
-            {data.map((entry) => (
-              <Cell key={entry.category} />
-            ))}
-          </Pie>
-
+          />
           <Tooltip
             formatter={(value) => [
               `${Number(value).toFixed(2)} ${currency}`,
