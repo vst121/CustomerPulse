@@ -130,21 +130,32 @@ This allows the system to evolve toward event-driven microservices without prema
 - Python 3.12
 - FastAPI
 - Pydantic
-- SQLAlchemy 2.x
-- PostgreSQL
+- SQLAlchemy 2.x (async)
+- asyncpg
+- PostgreSQL 17
 - Alembic
 - asyncio
 - pytest
 - HTTPX / FastAPI TestClient
+
+## Frontend
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS
+- Recharts (charts and visualizations)
+- ESLint
+
+## Deployment & Infrastructure
+
+- Docker Compose
 
 ## Planned / Future
 
 - Apache Kafka
 - MongoDB
 - ML/model-serving infrastructure
-- Next.js
-- TypeScript
-- Docker
 - Linux
 - Jenkins
 - SonarQube
@@ -164,38 +175,147 @@ CustomerPulse/
 │   ├── app/
 │   │   ├── api/
 │   │   │   └── v1/
-│   │   │
+│   │   │       ├── customer_360.py
+│   │   │       ├── customers.py
+│   │   │       ├── health.py
+│   │   │       ├── recommendations.py
+│   │   │       ├── router.py
+│   │   │       ├── scoring.py
+│   │   │       └── transactions.py
 │   │   ├── application/
-│   │   │
+│   │   │   ├── common/
+│   │   │   ├── customers/
+│   │   │   ├── recommendations/
+│   │   │   ├── scoring/
+│   │   │   ├── transactions/
+│   │   │   └── exceptions.py
+│   │   ├── config/
+│   │   │   └── settings.py
 │   │   ├── domain/
-│   │   │
+│   │   │   ├── customers/
+│   │   │   ├── recommendations/
+│   │   │   ├── scoring/
+│   │   │   ├── transactions/
+│   │   │   └── value/
 │   │   ├── infrastructure/
-│   │   │
+│   │   │   └── database/
+│   │   │       ├── repositories/
+│   │   │       ├── database.py
+│   │   │       ├── models.py
+│   │   │       └── unit_of_work.py
+│   │   ├── schemas/
+│   │   │   ├── customer_360.py
+│   │   │   ├── customer_intelligence.py
+│   │   │   ├── customers.py
+│   │   │   └── transactions.py
 │   │   └── main.py
-│   │
-│   ├── tests/
-│   │   ├── unit/
-│   │   ├── integration/
-│   │   └── api/
-│   │
 │   ├── alembic/
-│   │   └── versions/
-│   │
+│   │   ├── versions/
+│   │   ├── env.py
+│   │   └── script.py.mako
 │   ├── alembic.ini
+│   ├── tests/
+│   │   ├── api/
+│   │   ├── integration/
+│   │   └── unit/
 │   └── pyproject.toml
 │
 ├── frontend/
-│
-├── infrastructure/
-│   └── docker-compose.yml
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── customers/
+│   │   │   │   ├── [customerId]/
+│   │   │   │   │   ├── 360/page.tsx
+│   │   │   │   │   ├── intelligence/page.tsx
+│   │   │   │   │   ├── recommendations/page.tsx
+│   │   │   │   │   ├── page.tsx
+│   │   │   │   │   └── transactions/
+│   │   │   │   ├── new/page.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── favicon.ico
+│   │   │   ├── globals.css
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   ├── components/
+│   │   │   ├── intelligence/
+│   │   │   ├── layout/
+│   │   │   ├── transactions/
+│   │   │   └── ui/
+│   │   ├── services/
+│   │   │   └── api/
+│   │   └── types/
+│   ├── .gitignore
+│   ├── eslint.config.mjs
+│   ├── next.config.ts
+│   ├── package.json
+│   ├── postcss.config.mjs
+│   ├── pnpm-lock.yaml
+│   ├── tsconfig.json
+│   └── README.md
 │
 ├── docs/
-│   ├── Requirements.md
 │   ├── Architecture.md
-│   └── ADR/
+│   └── Requirements.md
 │
+├── docker-compose.yml
+├── pyproject.toml
 └── README.md
 ```
+
+---
+
+# Getting Started
+
+## Prerequisites
+
+- Python 3.12+
+- Node.js 20+
+- pnpm 9+
+- Docker & Docker Compose (for PostgreSQL)
+- PostgreSQL 17 (or use the provided docker-compose)
+
+## Setup — Backend
+
+```bash
+# Start PostgreSQL
+docker-compose up -d
+
+# Install dependencies
+pip install -e ".[dev]"
+
+# Run database migrations
+alembic upgrade head
+
+# Run tests
+pytest
+```
+
+## Setup — Frontend
+
+```bash
+cd frontend
+
+# Install dependencies
+pnpm install
+
+# Run the development server
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+The frontend proxies API requests to `http://localhost:8000` by default (configurable via `NEXT_PUBLIC_API_BASE_URL`).
+
+## Running the Backend
+
+```bash
+# Development server (API docs at http://localhost:8000/docs)
+uvicorn backend.app.main:app --reload
+```
+
+The API documentation is available at:
+- Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
+- ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
 
@@ -573,6 +693,99 @@ race condition.
 
 ---
 
+# 16. Frontend
+
+A Next.js + TypeScript frontend provides the user interface for the platform.
+
+## Pages
+
+### Dashboard
+
+```text
+GET /  (static)
+```
+
+Displays the customer count and an overview of the customer lifecycle stages.
+
+### Customer List
+
+```text
+GET /customers
+```
+
+Lists customers with:
+- Search by name/email
+- Filtering by lifecycle stage
+- Pagination
+
+### Customer Profile
+
+```text
+GET /customers/{customerId}
+```
+
+Shows customer details, lifecycle stage, and links to transactions, 360 view, intelligence, and recommendations.
+
+### Customer 360
+
+```text
+GET /customers/{customerId}/360
+```
+
+A unified read model combining customer profile, value, score, transactions, and recommendations. Includes:
+- KPI cards (total spend, transaction count, customer score)
+- Transaction trend chart (recharts)
+- Spending by category chart (recharts)
+- Recent transactions table
+
+### Customer Intelligence
+
+```text
+GET /customers/{customerId}/intelligence
+```
+
+Displays customer health, behavioral signals, risk assessment (churn probability), and the decision/next-best-action flow.
+
+### Recommendations
+
+```text
+GET  /customers/{customerId}/recommendations
+POST /customers/{customerId}/recommendations/generate
+```
+
+Lists existing recommendations and allows on-demand generation of Next Best Action recommendations.
+
+### Transactions
+
+```text
+GET  /customers/{customerId}/transactions
+POST /customers/{customerId}/transactions/new
+```
+
+Lists customer transactions with pagination and provides a form to record new transactions (with idempotency keys).
+
+### Create Customer
+
+```text
+POST /customers/new
+```
+
+Form to create a new customer.
+
+## Frontend Architecture
+
+- **Next.js App Router** for file-based routing
+- **React Server/Client component split** for optimal data fetching
+- **apiClient** wrapper using the native `fetch` API with centralized error handling
+- **TypeScript types** mirroring backend schemas (`@/types/`)
+- **Tailwind CSS** with dark mode support via `ThemeProvider`
+- **Component library** with reusable UI primitives (`Card`, `Badge`, `MetricCard`, `LoadingState`, `ErrorState`)
+- Theme-aware styling throughout (light/dark mode toggle)
+
+The frontend consumes the versioned FastAPI APIs under `/api/v1/`.
+
+---
+
 # Phase 1 Result
 
 At the end of Phase 1, CustomerPulse is a functional customer intelligence backend.
@@ -593,7 +806,7 @@ Generate Next Best Action
 Expose Customer 360
 ```
 
-with asynchronous background scoring and automated tests.
+with asynchronous background scoring, an interactive Next.js frontend, and automated tests.
 
 **Phase 1: 🟢 COMPLETE**
 
@@ -1021,7 +1234,7 @@ Potential tooling:
 
 # 15. Frontend
 
-A Next.js + TypeScript frontend will eventually provide:
+A Next.js + TypeScript frontend provides the user interface:
 
 ```text
 Customer Dashboard
@@ -1031,11 +1244,12 @@ Customer Dashboard
        ├── Transactions
        ├── Customer Value
        ├── Score
+       ├── Intelligence
        ├── Recommendations
        └── Next Best Actions
 ```
 
-The frontend will consume the versioned FastAPI APIs.
+The frontend consumes the versioned FastAPI APIs under `/api/v1/`.
 
 ---
 
@@ -1167,6 +1381,7 @@ GET    /api/v1/health
 GET    /api/v1/customers
 POST   /api/v1/customers
 GET    /api/v1/customers/{customer_id}
+GET    /api/v1/customers/{customer_id}/intelligence
 
 GET    /api/v1/transactions/customers/{customer_id}
 POST   /api/v1/transactions/customers/{customer_id}
