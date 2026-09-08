@@ -1,85 +1,149 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState } from "react";
+
 import MetricCard from "@/components/ui/MetricCard";
+import { getCustomers } from "@/services/api/customers";
+
+const lifecycleStages = [
+  "Acquisition",
+  "Onboarding",
+  "Activation",
+  "Engagement",
+  "Growth",
+  "Retention",
+  "Win-back",
+];
 
 export default function HomePage() {
+  const [customerCount, setCustomerCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function loadCustomerCount() {
+      try {
+        const response = await getCustomers({
+          page: 1,
+          page_size: 1,
+        });
+
+        setCustomerCount(response.total);
+      } catch {
+        setCustomerCount(null);
+      }
+    }
+
+    loadCustomerCount();
+  }, []);
+
   return (
-    <main className="flex min-h-screen">
-      <aside className="w-64 border-r border-slate-200 bg-white">
-        <div className="flex h-16 items-center border-b border-slate-200 px-6">
-          <h1 className="text-xl font-bold tracking-tight text-slate-900">
-            CustomerPulse
-          </h1>
+    <main className="min-h-screen">
+      <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
+        <div>
+          <h2 className="text-lg font-semibold">Dashboard</h2>
+
+          <p className="text-sm text-slate-500">
+            Customer lifecycle and value management
+          </p>
+        </div>
+        <div className="text-sm text-slate-600">Hi User!</div>
+      </header>
+
+      <div className="p-8">
+        <div className="mb-8">
+          <p className="text-sm font-medium text-slate-500">
+            Customer Lifecycle & Value Management
+          </p>
+
+          <h3 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
+            Customer Overview
+          </h3>
+
+          <p className="mt-2 max-w-2xl text-slate-600">
+            Understand your customers, their lifecycle, and the actions that
+            can improve customer value.
+          </p>
         </div>
 
-        <nav className="space-y-1 p-4">
-          <Link
-            href="/"
-            className="flex items-center rounded-lg bg-slate-100 px-4 py-3 text-sm font-medium text-slate-900"
-          >
-            Dashboard
-          </Link>
+        <div className="mb-10 max-w-sm">
+          <MetricCard
+            title="Customers"
+            value={customerCount !== null ? String(customerCount) : "—"}
+            description="Total customers"
+          />
+        </div>
 
-          <Link
-            href="/customers"
-            className="flex items-center rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-          >
-            Customers
-          </Link>
-        </nav>
-      </aside>
+        <section>
+          <div className="mb-4">
+            <h4 className="text-lg font-semibold text-slate-900">
+              Customer Lifecycle
+            </h4>
 
-      <section className="flex-1">
-        <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
-          <div>
-            <h2 className="text-lg font-semibold">Dashboard</h2>
-
-            <p className="text-sm text-slate-500">
-              Customer lifecycle and value management
+            <p className="mt-1 text-sm text-slate-500">
+              CustomerPulse manages the customer journey from acquisition to
+              win-back.
             </p>
           </div>
 
-          <div className="text-sm text-slate-600">CustomerPulse</div>
-        </header>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+            {lifecycleStages.map((stage, index) => (
+              <div
+                key={stage}
+                className="rounded-xl border border-slate-200 bg-white p-5"
+              >
+                <div className="mb-4 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700">
+                  {index + 1}
+                </div>
 
-        <div className="p-8">
-          <div className="mb-8">
-            <h3 className="text-2xl font-bold tracking-tight">
-              Welcome to CustomerPulse
-            </h3>
+                <h5 className="text-sm font-semibold text-slate-900">
+                  {stage}
+                </h5>
 
-            <p className="mt-2 text-slate-600">
-              Understand your customers, predict their behavior, and choose the
-              next best action.
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  Customer lifecycle stage
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-10">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
+            <h4 className="text-lg font-semibold text-slate-900">
+              Customer Intelligence
+            </h4>
+
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+              CustomerPulse combines customer behavior, value, lifecycle
+              signals, churn prediction, and next-best-action decisions to
+              support customer-focused decisions.
             </p>
+
+            <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
+              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200">
+                Customer Data
+              </span>
+
+              <span className="text-slate-400">→</span>
+
+              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200">
+                Prediction
+              </span>
+
+              <span className="text-slate-400">→</span>
+
+              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200">
+                Decision
+              </span>
+
+              <span className="text-slate-400">→</span>
+
+              <span className="rounded-full bg-white px-3 py-1.5 font-medium text-slate-700 ring-1 ring-slate-200">
+                Next Best Action
+              </span>
+            </div>
           </div>
-
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard
-              title="Customers"
-              value="—"
-              description="Total customers"
-            />
-
-            <MetricCard
-              title="Active"
-              value="—"
-              description="Active customers"
-            />
-
-            <MetricCard
-              title="Churn Risk"
-              value="—"
-              description="High-risk customers"
-            />
-
-            <MetricCard
-              title="Recommendations"
-              value="—"
-              description="Pending actions"
-            />
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }

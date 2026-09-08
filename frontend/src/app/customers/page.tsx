@@ -87,17 +87,16 @@ export default function CustomersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="px-8 py-6">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Customers
-          </h1>
+    <main className="min-h-screen">
+      <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
+        <div>
+          <h2 className="text-lg font-semibold">Customers</h2>
 
-          <p className="mt-1 text-sm text-slate-500">
-            Manage customers and understand their lifecycle.
+          <p className="text-sm text-slate-500">
+            Manage customers and understand their lifecycle
           </p>
         </div>
+        <div className="text-sm text-slate-600">Hi User!</div>
       </header>
 
       <section className="p-8">

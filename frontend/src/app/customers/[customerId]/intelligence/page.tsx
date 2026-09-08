@@ -181,7 +181,7 @@ export default function IntelligencePage({ params }: IntelligencePageProps) {
 
             <SignalCard
               title="Average Transaction"
-              value={`€${intelligence.features.average_transaction_value}`}
+              value={`€${Number(intelligence.features.average_transaction_value ?? 0).toFixed(2)}`}
               description="Average transaction value"
             />
 
