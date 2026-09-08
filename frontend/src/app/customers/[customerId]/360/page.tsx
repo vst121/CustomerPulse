@@ -6,6 +6,7 @@ import { getCustomer360 } from "@/services/api/customers";
 import type { Customer360 } from "@/types/customer360";
 import Badge from "@/components/ui/Badge";
 import TransactionTrendChart from "@/components/transactions/TransactionTrendChart";
+import SpendingByCategoryChart from "@/components/transactions/SpendingByCategoryChart";
 
 type Customer360PageProps = {
   params: Promise<{
@@ -65,6 +66,7 @@ export default function Customer360Page({ params }: Customer360PageProps) {
   }
 
   const transactionTrend = buildTransactionTrend(customer.transactions);
+  const spendingByCategory = buildSpendingByCategory(customer.transactions);
 
   const transactionCurrency =
     customer.transactions.find(
@@ -199,6 +201,27 @@ export default function Customer360Page({ params }: Customer360PageProps) {
           <div className="p-6">
             <TransactionTrendChart
               data={transactionTrend}
+              currency={transactionCurrency}
+            />
+          </div>
+        </section>
+
+        {/* Spending by Category */}
+
+        <section className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-6 py-4">
+            <h2 className="font-semibold text-slate-900">
+              Spending by Category
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Distribution of customer spending across transaction categories.
+            </p>
+          </div>
+
+          <div className="p-6">
+            <SpendingByCategoryChart
+              data={spendingByCategory}
               currency={transactionCurrency}
             />
           </div>
@@ -374,4 +397,28 @@ function buildTransactionTrend(transactions: Customer360["transactions"]) {
       month,
       amount,
     }));
+}
+
+function buildSpendingByCategory(transactions: Customer360["transactions"]) {
+  const categoryTotals = new Map<string, number>();
+
+  for (const transaction of transactions) {
+    if (transaction.status !== "COMPLETED") {
+      continue;
+    }
+
+    const amount = Number(transaction.amount);
+
+    categoryTotals.set(
+      transaction.category,
+      (categoryTotals.get(transaction.category) ?? 0) + amount,
+    );
+  }
+
+  return Array.from(categoryTotals.entries())
+    .map(([category, amount]) => ({
+      category,
+      amount,
+    }))
+    .sort((a, b) => b.amount - a.amount);
 }
