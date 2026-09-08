@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getCustomer360 } from "@/services/api/customers";
 import type { Customer360 } from "@/types/customer360";
 import Badge from "@/components/ui/Badge";
+import TransactionTrendChart from "@/components/transactions/TransactionTrendChart";
 
 type Customer360PageProps = {
   params: Promise<{
@@ -40,7 +41,8 @@ export default function Customer360Page({ params }: Customer360PageProps) {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 p-8">
-        <p className="text-sm text-slate-500">Loading customer 360...</p>
+        {" "}
+        <p className="text-sm text-slate-500">Loading customer 360...</p>{" "}
       </main>
     );
   }
@@ -48,11 +50,12 @@ export default function Customer360Page({ params }: Customer360PageProps) {
   if (error || !customer) {
     return (
       <main className="min-h-screen bg-slate-50 p-8">
+        {" "}
         <div className="rounded-xl border border-red-200 bg-red-50 p-6">
+          {" "}
           <h1 className="font-semibold text-red-900">
-            Unable to load customer 360
+            Unable to load customer 360{" "}
           </h1>
-
           <p className="mt-2 text-sm text-red-700">
             {error ?? "Customer not found."}
           </p>
@@ -60,6 +63,13 @@ export default function Customer360Page({ params }: Customer360PageProps) {
       </main>
     );
   }
+
+  const transactionTrend = buildTransactionTrend(customer.transactions);
+
+  const transactionCurrency =
+    customer.transactions.find(
+      (transaction) => transaction.status === "COMPLETED",
+    )?.currency ?? "EUR";
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -173,6 +183,27 @@ export default function Customer360Page({ params }: Customer360PageProps) {
           </section>
         </div>
 
+        {/* Transaction Activity */}
+
+        <section className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-6 py-4">
+            <h2 className="font-semibold text-slate-900">
+              Transaction Activity
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Monthly customer spending based on completed transactions.
+            </p>
+          </div>
+
+          <div className="p-6">
+            <TransactionTrendChart
+              data={transactionTrend}
+              currency={transactionCurrency}
+            />
+          </div>
+        </section>
+
         {/* Transactions */}
 
         <section className="mt-8 rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -268,12 +299,11 @@ type MetricCardProps = {
 function MetricCard({ title, value, description }: MetricCardProps) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      {" "}
       <p className="text-sm font-medium text-slate-500">{title}</p>
-
       <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
         {value}
       </p>
-
       <p className="mt-2 text-sm text-slate-500">{description}</p>
     </div>
   );
@@ -287,11 +317,61 @@ type InfoRowProps = {
 function InfoRow({ label, value }: InfoRowProps) {
   return (
     <div className="flex items-center justify-between gap-4">
+      {" "}
       <span className="text-sm text-slate-500">{label}</span>
-
       <span className="text-right text-sm font-medium text-slate-900">
         {value}
       </span>
     </div>
   );
+}
+
+function buildTransactionTrend(transactions: Customer360["transactions"]) {
+  const monthlyTotals = new Map<
+    string,
+    {
+      amount: number;
+      timestamp: number;
+    }
+  >();
+
+  for (const transaction of transactions) {
+    if (transaction.status !== "COMPLETED") {
+      continue;
+    }
+
+    const date = new Date(transaction.timestamp);
+
+    const month = date.toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
+
+    const timestamp = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      1,
+    ).getTime();
+
+    const amount = Number(transaction.amount);
+
+    const existing = monthlyTotals.get(month);
+
+    monthlyTotals.set(month, {
+      amount: (existing?.amount ?? 0) + amount,
+      timestamp,
+    });
+  }
+
+  return Array.from(monthlyTotals.entries())
+    .map(([month, data]) => ({
+      month,
+      amount: data.amount,
+      timestamp: data.timestamp,
+    }))
+    .sort((a, b) => a.timestamp - b.timestamp)
+    .map(({ month, amount }) => ({
+      month,
+      amount,
+    }));
 }
