@@ -46,6 +46,7 @@ export default function HomePage() {
         <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
           <div>
             <h2 className="text-lg font-semibold">Dashboard</h2>
+
             <p className="text-sm text-slate-500">
               Customer lifecycle and value management
             </p>
@@ -65,21 +66,32 @@ export default function HomePage() {
               next best action.
             </p>
           </div>
+
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard
-              title="Lifecycle Stage"
-              value={customer.lifecycle_stage}
+              title="Customers"
+              value="—"
+              description="Total customers"
             />
-
-            <MetricCard title="Customer ID" value={customer.id} />
-
-            <MetricCard title="Email" value={customer.email} />
 
             <MetricCard
-              title="Customer Since"
-              value={new Date(customer.created_at).toLocaleDateString()}
+              title="Active"
+              value="—"
+              description="Active customers"
             />
-          </div>{" "}
+
+            <MetricCard
+              title="Churn Risk"
+              value="—"
+              description="High-risk customers"
+            />
+
+            <MetricCard
+              title="Recommendations"
+              value="—"
+              description="Pending actions"
+            />
+          </div>
         </div>
       </section>
     </main>
